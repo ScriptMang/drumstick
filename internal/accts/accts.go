@@ -14,6 +14,15 @@ type UserAccount struct {
 	Password []byte `json:"password" form:"password"`
 }
 
+type Account struct {
+	ID       int    `json:"id" form:"id"`
+	Fname    string `json:"fname" form:"fname"`
+	Lname    string `json:"lname" form:"lname"`
+	Address  string `json:"address" form:"address"`
+	Username string `json:"username" form:"username"`
+	Password []byte `json:"password" form:"password"`
+}
+
 type Posts struct {
 	ID               int    `json:"id" form:"id"`
 	User_ID          int    `json:"user_id" form:"user_id"`
