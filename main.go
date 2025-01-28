@@ -4,8 +4,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/ScriptMang/drumstick/internal/accts"
-	"github.com/ScriptMang/drumstick/internal/backend"
+	"scriptmang/drumstick/internal/accts"
+	"scriptmang/drumstick/internal/backend"
+
 	"github.com/georgysavva/scany/v2/pgxscan"
 )
 
