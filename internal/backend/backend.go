@@ -8,7 +8,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func CreatePool() (context.Context, *pgxpool.Pool) {
+func Connect() (context.Context, *pgxpool.Pool) {
 	ctx := context.Background()
 	uri := "postgres://username@localhost:5432/drumstick"
 	os.Setenv("DATABASE_URL", uri)
