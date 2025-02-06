@@ -33,6 +33,11 @@ func (tm *TemplateManager) Render(w io.Writer, name string, data interface{}, c 
 // func viewPosts(w http.ResponseWriter, r *http.Request) {
 // }
 
+func signUp(c echo.Context) error {
+	data := "Register a New User"
+	return c.Render(http.StatusOK, "signup", data)
+}
+
 
 	ctx, db := backend.CreatePool()
 	defer db.Close()
@@ -58,4 +63,5 @@ func main() {
 	router := echo.New()
 	router.Renderer = tm
 	router.GET("/", homePage)
+	router.GET("/signup", signUp)
 }
