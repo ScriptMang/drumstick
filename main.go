@@ -64,4 +64,5 @@ func main() {
 	router.Renderer = tm
 	router.GET("/", homePage)
 	router.GET("/signup", signUp)
+	router.Logger.Fatal(router.Start(":8080"))
 }
