@@ -13,6 +13,10 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+type respBody struct {
+	msg string
+}
+
 type TemplateManager struct {
 	templates *template.Template
 }
@@ -38,15 +42,33 @@ func signUp(c echo.Context) error {
 	return c.Render(http.StatusOK, "signup", data)
 }
 
+func accountCreation(c echo.Context) error {
+	var resp respBody
+	var newAcct accts.Account
 
-	ctx, db := backend.CreatePool()
-	defer db.Close()
+	newAcct.Fname = c.FormValue("fname")
+	newAcct.Lname = c.FormValue("lname")
+	newAcct.Address = c.FormValue("address")
+	newAcct.Username = c.FormValue("username")
+	newAcct.Password = []byte(c.FormValue("password"))
 
-	var userProf accts.UserProfile
-	err := pgxscan.Select(ctx, db, &userProf, `SELECT * FROM user_profile`)
+	var rsltErr []error
+	accts.VetEmptyFields(newAcct, rsltErr)
+	if len(rsltErr) > 0 {
+		return errors.Join(rsltErr...)
+	}
+
+	msg, err := accts.CreateAcct(newAcct)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error: %v\n", err.Error())
-		os.Exit(1)
+		fmt.Println(err.Error())
+		return err
+	}
+
+	resp.msg = msg
+	// fmt.Println(resp)
+	return c.Render(http.StatusOK, "view", resp)
+}
+
 func homePage(c echo.Context) error {
 	data := "Welcome to drumstick"
 	return c.Render(http.StatusOK, "home", data)
@@ -64,5 +86,6 @@ func main() {
 	router.Renderer = tm
 	router.GET("/", homePage)
 	router.GET("/signup", signUp)
+	router.POST("/view", accountCreation)
 	router.Logger.Fatal(router.Start(":8080"))
 }

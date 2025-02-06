@@ -51,6 +51,34 @@ func encryptPassword(s []byte) ([]byte, error) {
 	return hash, err
 }
 
+func VetEmptyFields(acct Account, rsltErr []error) {
+	errEmptyFname := errors.New("fname can't be empty")
+	errEmptyLname := errors.New("lname can't be empty")
+	errEmptyAddress := errors.New("address can't be empty")
+	errEmptyUsername := errors.New("username can't be empty")
+	errEmptyPswd := errors.New("password can't be empty")
+
+	if acct.Fname == "" {
+		rsltErr = append(rsltErr, errEmptyFname)
+	}
+
+	if acct.Lname == "" {
+		rsltErr = append(rsltErr, errEmptyLname)
+	}
+
+	if acct.Address == "" {
+		rsltErr = append(rsltErr, errEmptyAddress)
+	}
+
+	if acct.Username == "" {
+		rsltErr = append(rsltErr, errEmptyUsername)
+	}
+
+	if len(acct.Password) == 0 {
+		rsltErr = append(rsltErr, errEmptyPswd)
+	}
+}
+
 // add user account to the database
 func addUserAcct(acct *Account) error {
 	ctx, db := backend.Connect()
