@@ -3,3 +3,10 @@
 /internal/.DS_Store
 /.DS_Store
 /internal/backend/backend.go~
+/tmp/
+/ui/.DS_Store
+/ui/html/.DS_Store
+/ui/html/pages/home.tmpl~
+/ui/html/pages/signup.tmpl~
+/ui/html/pages/tmp/
+/ui/html/pages/view.tmpl~
