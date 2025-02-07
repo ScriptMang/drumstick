@@ -11,6 +11,7 @@ import (
 	"scriptmang/drumstick/internal/accts"
 
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 )
 
 type respBody struct {
@@ -83,6 +84,7 @@ func main() {
 		templates: template.Must(template.ParseGlob("ui/html/pages/*[^#?!|].tmpl")),
 	}
 	router := echo.New()
+	router.Use(middleware.SecureWithConfig(middleware.DefaultSecureConfig))
 	router.Renderer = tm
 	router.GET("/", homePage)
 	router.GET("/signup", signUp)
