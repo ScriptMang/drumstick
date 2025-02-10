@@ -80,6 +80,10 @@ func login(c echo.Context) error {
 	return c.Render(http.StatusOK, "login", str)
 }
 
+func vetLogin(c echo.Context) error {
+
+}
+
 func main() {
 	tm := &TemplateManager{
 		templates: template.Must(template.ParseGlob("ui/html/pages/*[^#?!|].tmpl")),
@@ -91,5 +95,6 @@ func main() {
 	router.GET("/signup", signUp)
 	router.GET("/login", login)
 	router.POST("/view", accountCreation)
+	router.POST("/login", vetLogin)
 	router.Logger.Fatal(router.Start(":8080"))
 }
