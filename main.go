@@ -75,9 +75,9 @@ func homePage(c echo.Context) error {
 	return c.Render(http.StatusOK, "home", data)
 }
 
-// func login(w http.ResponseWriter, r *http.Request) {
+func login(c echo.Context) {
 
-// }
+}
 
 func main() {
 	tm := &TemplateManager{
