@@ -71,7 +71,7 @@ func accountCreation(c echo.Context) error {
 }
 
 func homePage(c echo.Context) error {
-	data := "Welcome to drumstick"
+	data := "Login or Create an Account"
 	return c.Render(http.StatusOK, "home", data)
 }
 
