@@ -75,8 +75,9 @@ func homePage(c echo.Context) error {
 	return c.Render(http.StatusOK, "home", data)
 }
 
-func login(c echo.Context) {
-
+func login(c echo.Context) error {
+	str := "Login to Drumstick"
+	return c.Render(http.StatusOK, "login", str)
 }
 
 func main() {
@@ -88,6 +89,7 @@ func main() {
 	router.Renderer = tm
 	router.GET("/", homePage)
 	router.GET("/signup", signUp)
+	router.GET("/login", login)
 	router.POST("/view", accountCreation)
 	router.Logger.Fatal(router.Start(":8080"))
 }

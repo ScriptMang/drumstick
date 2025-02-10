@@ -1,0 +1,24 @@
+{{define "login"}}
+<!DOCTYPE html>
+<html lang='en'>
+  <head>
+     <meta charset='utf-8'>
+     <title>Sign-Up</title>
+     <link rel='stylesheet' href='https://fonts.google.apis.com/css?family=Ubuntu+Mono:400,700'>
+  </head>
+  <body>
+    <header>
+        <h1>{{.}}</h1>
+    </header>
+       <form action= "/udecided" method="post">
+        <label for="username">username</label><br>
+        <input type="text" id="username" name="username"><br>        
+
+         <label for="password">password</label><br>
+         <input type="password" id="password" name="password"><br><br>
+         <input type="submit" value="submit">
+       </form>
+    </body>
+</html>
+
+{{end}}
