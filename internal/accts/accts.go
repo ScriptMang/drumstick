@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"scriptmang/drumstick/internal/backend"
+	"strings"
 
 	"github.com/georgysavva/scany/v2/pgxscan"
 	"github.com/jackc/pgx/v5"
@@ -76,6 +77,59 @@ func VetEmptyFields(acct Account, rsltErr []error) {
 
 	if len(acct.Password) == 0 {
 		rsltErr = append(rsltErr, errEmptyPswd)
+	}
+}
+
+// check user credentials for empty fields
+// and append the errors to the err slice
+func VetUserCreds(username, password string, rsltErr []error) {
+	emptyUsername := errors.New("username can't be empty")
+	emptyPswd := errors.New("password can't be empty")
+	usernameTooShort := errors.New("username is too short")
+	usernameTooLong := errors.New("username is too long")
+	pswdTooShort := errors.New("password is too short")
+	pswdTooLong := errors.New("password is too long")
+	missingCapitalLetter := errors.New("password is missing a capital letter")
+	missingNumber := errors.New("password is missing a capital letter")
+	symbolsInUsername := errors.New("no special symbols in the username")
+
+	switch {
+	case username == "":
+		rsltErr = append(rsltErr, emptyUsername)
+	case len(username) < 15:
+		rsltErr = append(rsltErr, usernameTooShort)
+	case len(username) > 15:
+		rsltErr = append(rsltErr, usernameTooLong)
+	}
+
+	switch {
+	case len(password) == 0:
+		rsltErr = append(rsltErr, emptyPswd)
+	case len(password) < 15:
+		rsltErr = append(rsltErr, pswdTooShort)
+	case len(password) > 15:
+		rsltErr = append(rsltErr, pswdTooLong)
+	}
+
+	// check for capital Letter in pswd
+	capLetters := "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	pswdHasCaps := strings.ContainsAny(password, capLetters)
+	if !pswdHasCaps {
+		rsltErr = append(rsltErr, missingCapitalLetter)
+	}
+
+	// check for number in pswd
+	nums := "012345689"
+	pswdHasNums := strings.ContainsAny(password, nums)
+	if !pswdHasNums {
+		rsltErr = append(rsltErr, missingNumber)
+	}
+
+	// check for symbols in  username
+	symbols := "?@#$!%^&*[]{}!()%\\`~"
+	userHasSymbols := strings.ContainsAny(username, symbols)
+	if userHasSymbols {
+		rsltErr = append(rsltErr, symbolsInUsername)
 	}
 }
 
