@@ -91,6 +91,7 @@ func VetUserCreds(username, password string, rsltErr []error) {
 	pswdTooLong := errors.New("password is too long")
 	missingCapitalLetter := errors.New("password is missing a capital letter")
 	missingNumber := errors.New("password is missing a capital letter")
+	punctInUsername := errors.New("no special punctuation in the username")
 	symbolsInUsername := errors.New("no special symbols in the username")
 
 	switch {
@@ -102,6 +103,13 @@ func VetUserCreds(username, password string, rsltErr []error) {
 		rsltErr = append(rsltErr, usernameTooLong)
 	}
 
+	// check for punct in username
+	punct := " ?!;:,."
+	userHasPunct := strings.ContainsAny(username, punct)
+	if userHasPunct {
+		rsltErr = append(rsltErr, punctInUsername)
+	}
+	// check for symbols in  username
 	symbols := "@#$%^&*[]{}()%|\\`~"
 	userHasSymbols := strings.ContainsAny(username, symbols)
 	if userHasSymbols {
