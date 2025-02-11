@@ -102,6 +102,12 @@ func VetUserCreds(username, password string, rsltErr []error) {
 		rsltErr = append(rsltErr, usernameTooLong)
 	}
 
+	symbols := "@#$%^&*[]{}()%|\\`~"
+	userHasSymbols := strings.ContainsAny(username, symbols)
+	if userHasSymbols {
+		rsltErr = append(rsltErr, symbolsInUsername)
+	}
+
 	switch {
 	case len(password) == 0:
 		rsltErr = append(rsltErr, emptyPswd)
@@ -123,13 +129,6 @@ func VetUserCreds(username, password string, rsltErr []error) {
 	pswdHasNums := strings.ContainsAny(password, nums)
 	if !pswdHasNums {
 		rsltErr = append(rsltErr, missingNumber)
-	}
-
-	// check for symbols in  username
-	symbols := "?@#$!%^&*[]{}!()%\\`~"
-	userHasSymbols := strings.ContainsAny(username, symbols)
-	if userHasSymbols {
-		rsltErr = append(rsltErr, symbolsInUsername)
 	}
 }
 
