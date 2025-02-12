@@ -82,7 +82,7 @@ func VetEmptyFields(acct Account, rsltErr []error) {
 
 // check user credentials for empty fields
 // and append the errors to the err slice
-func VetUserCreds(username, password string, rsltErr []error) {
+func VetUserCreds(username, password string) []error {
 	emptyUsername := errors.New("username can't be empty")
 	emptyPswd := errors.New("password can't be empty")
 	usernameTooShort := errors.New("username is too short")
@@ -94,6 +94,7 @@ func VetUserCreds(username, password string, rsltErr []error) {
 	punctInUsername := errors.New("no special punctuation in the username")
 	symbolsInUsername := errors.New("no special symbols in the username")
 
+	var rsltErr []error
 	switch {
 	case username == "":
 		rsltErr = append(rsltErr, emptyUsername)
@@ -138,6 +139,8 @@ func VetUserCreds(username, password string, rsltErr []error) {
 	if !pswdHasNums {
 		rsltErr = append(rsltErr, missingNumber)
 	}
+
+	return rsltErr
 }
 
 // add user account to the database

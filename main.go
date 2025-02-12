@@ -81,7 +81,15 @@ func login(c echo.Context) error {
 }
 
 func vetLogin(c echo.Context) error {
+	usr := c.FormValue("username")
+	pswd := c.FormValue("password")
 
+	rsltErr := accts.VetUserCreds(usr, pswd)
+	if len(rsltErr) > 0 {
+		return echo.NewHTTPError(http.StatusBadRequest, errors.Join(rsltErr...))
+	}
+
+	return c.Render(http.StatusOK, "posts", "My Feed")
 }
 
 func main() {
@@ -95,6 +103,6 @@ func main() {
 	router.GET("/signup", signUp)
 	router.GET("/login", login)
 	router.POST("/view", accountCreation)
-	router.POST("/login", vetLogin)
+	router.POST("/posts", vetLogin)
 	router.Logger.Fatal(router.Start(":8080"))
 }
