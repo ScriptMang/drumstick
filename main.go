@@ -53,7 +53,7 @@ func accountCreation(c echo.Context) error {
 	newAcct.Username = c.FormValue("username")
 	newAcct.Password = []byte(c.FormValue("password"))
 
-	rsltErr := accts.VetEmptyFields(newAcct)
+	rsltErr := accts.VetAllFields(newAcct)
 	if len(rsltErr) > 0 {
 		return echo.NewHTTPError(http.StatusBadRequest, errors.Join(rsltErr...))
 	}

@@ -52,7 +52,7 @@ func encryptPassword(s []byte) ([]byte, error) {
 	return hash, err
 }
 
-func VetEmptyFields(acct Account) []error {
+func VetAllFields(acct Account) []error {
 
 	errEmptyField := errors.New("field is empty")
 	var rsltErr []error
