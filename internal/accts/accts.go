@@ -52,7 +52,7 @@ func encryptPassword(s []byte) ([]byte, error) {
 	return hash, err
 }
 
-func VetEmptyFields(acct Account, rsltErr []error) {
+func VetEmptyFields(acct Account) []error {
 	errEmptyFname := errors.New("fname can't be empty")
 	errEmptyLname := errors.New("lname can't be empty")
 	errEmptyAddress := errors.New("address can't be empty")
@@ -78,6 +78,8 @@ func VetEmptyFields(acct Account, rsltErr []error) {
 	if len(acct.Password) == 0 {
 		rsltErr = append(rsltErr, errEmptyPswd)
 	}
+
+	return rsltErr
 }
 
 // check user credentials for empty fields
