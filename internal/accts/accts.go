@@ -53,30 +53,29 @@ func encryptPassword(s []byte) ([]byte, error) {
 }
 
 func VetEmptyFields(acct Account) []error {
-	errEmptyFname := errors.New("fname can't be empty")
-	errEmptyLname := errors.New("lname can't be empty")
-	errEmptyAddress := errors.New("address can't be empty")
-	errEmptyUsername := errors.New("username can't be empty")
-	errEmptyPswd := errors.New("password can't be empty")
 
+	errEmptyField := errors.New("field is empty")
+	var rsltErr []error
 	if acct.Fname == "" {
-		rsltErr = append(rsltErr, errEmptyFname)
+		rsltErr = append(rsltErr, fmt.Errorf("error:fname:%w", errEmptyField))
+	}
 	}
 
 	if acct.Lname == "" {
-		rsltErr = append(rsltErr, errEmptyLname)
+		rsltErr = append(rsltErr, fmt.Errorf("error:lname:%w", errEmptyField))
+	}
 	}
 
 	if acct.Address == "" {
-		rsltErr = append(rsltErr, errEmptyAddress)
+		rsltErr = append(rsltErr, fmt.Errorf("error:address:%w", errEmptyField))
 	}
 
 	if acct.Username == "" {
-		rsltErr = append(rsltErr, errEmptyUsername)
+		rsltErr = append(rsltErr, fmt.Errorf("error:username:%w", errEmptyField))
 	}
 
 	if len(acct.Password) == 0 {
-		rsltErr = append(rsltErr, errEmptyPswd)
+		rsltErr = append(rsltErr, fmt.Errorf("error:passsword:%w", errEmptyField))
 	}
 
 	return rsltErr
