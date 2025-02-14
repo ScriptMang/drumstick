@@ -1,6 +1,7 @@
 package accts
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"scriptmang/drumstick/internal/backend"
@@ -56,10 +57,17 @@ func VetAllFields(acct Account) []error {
 
 	errEmptyField := errors.New("field is empty")
 	errHasNums := errors.New("field can't contain any numbers")
+	errHasSymbols := errors.New("field can't contain any symbols")
+	symbolsFilter := "!@$_^%&*();/-+=\"'`~[]{}<|>"
 
 	var rsltErr []error
+
 	if acct.Fname == "" {
 		rsltErr = append(rsltErr, fmt.Errorf("error:fname:%w", errEmptyField))
+	}
+
+	if strings.ContainsAny(acct.Fname, symbolsFilter) {
+		rsltErr = append(rsltErr, fmt.Errorf("error:fname:%w", errHasSymbols))
 	}
 
 	// first name can't have any numbers
@@ -71,6 +79,10 @@ func VetAllFields(acct Account) []error {
 		rsltErr = append(rsltErr, fmt.Errorf("error:lname:%w", errEmptyField))
 	}
 
+	if strings.ContainsAny(acct.Lname, symbolsFilter) {
+		rsltErr = append(rsltErr, fmt.Errorf("error:lname:%w", errHasSymbols))
+	}
+
 	// last name can't have any numbers
 	if strings.ContainsAny(acct.Lname, "0123456789") {
 		rsltErr = append(rsltErr, fmt.Errorf("error:lname:%w", errHasNums))
@@ -80,12 +92,24 @@ func VetAllFields(acct Account) []error {
 		rsltErr = append(rsltErr, fmt.Errorf("error:address:%w", errEmptyField))
 	}
 
+	if strings.ContainsAny(acct.Address, symbolsFilter) {
+		rsltErr = append(rsltErr, fmt.Errorf("error:address:%w", errHasSymbols))
+	}
+
 	if acct.Username == "" {
 		rsltErr = append(rsltErr, fmt.Errorf("error:username:%w", errEmptyField))
 	}
 
+	if strings.ContainsAny(acct.Username, symbolsFilter) {
+		rsltErr = append(rsltErr, fmt.Errorf("error:username:%w", errHasSymbols))
+	}
+
 	if len(acct.Password) == 0 {
 		rsltErr = append(rsltErr, fmt.Errorf("error:passsword:%w", errEmptyField))
+	}
+
+	if bytes.ContainsAny(acct.Password, symbolsFilter) {
+		rsltErr = append(rsltErr, fmt.Errorf("error:password:%w", errHasSymbols))
 	}
 
 	return rsltErr
