@@ -55,15 +55,25 @@ func encryptPassword(s []byte) ([]byte, error) {
 func VetAllFields(acct Account) []error {
 
 	errEmptyField := errors.New("field is empty")
+	errHasNums := errors.New("field can't contain any numbers")
+
 	var rsltErr []error
 	if acct.Fname == "" {
 		rsltErr = append(rsltErr, fmt.Errorf("error:fname:%w", errEmptyField))
 	}
+
+	// first name can't have any numbers
+	if strings.ContainsAny(acct.Fname, "0123456789") {
+		rsltErr = append(rsltErr, fmt.Errorf("error:fname:%w", errHasNums))
 	}
 
 	if acct.Lname == "" {
 		rsltErr = append(rsltErr, fmt.Errorf("error:lname:%w", errEmptyField))
 	}
+
+	// last name can't have any numbers
+	if strings.ContainsAny(acct.Lname, "0123456789") {
+		rsltErr = append(rsltErr, fmt.Errorf("error:lname:%w", errHasNums))
 	}
 
 	if acct.Address == "" {
