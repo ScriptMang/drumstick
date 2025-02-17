@@ -74,22 +74,22 @@ func fieldHasNumbers(val, fieldname string) error {
 	return rsltErr
 }
 
-	if strings.ContainsAny(acct.Lname, symbolsFilter) {
-		rsltErr = append(rsltErr, fmt.Errorf("error:lname:%w", errHasSymbols))
-	}
+// checks an account field for any symbols and returns a slice of errors
+func fieldHasSymbols(val, fieldname string) error {
+	var rsltErr error
+	errHasSymbols := errors.New("field can't contain any symbols")
+	symbolsFilter := "!@$_^%&*();/-+=\"'`~[]{}<|>"
 
-	// last name can't have any numbers
-	if strings.ContainsAny(acct.Lname, "0123456789") {
-		rsltErr = append(rsltErr, fmt.Errorf("error:lname:%w", errHasNums))
+	if strings.ContainsAny(val, symbolsFilter) {
+		rsltErr = fmt.Errorf("error:%s:%w", fieldname, errHasSymbols)
 	}
+	return rsltErr
+}
 
 func VetAllFields(acct Account) []error {
 	var tmpErrs []error
 	var rsltErr []error
 
-	if strings.ContainsAny(acct.Address, symbolsFilter) {
-		rsltErr = append(rsltErr, fmt.Errorf("error:address:%w", errHasSymbols))
-	}
 	tmpErrs = append(tmpErrs, fieldIsEmpty(acct.Fname, "fname"))
 	tmpErrs = append(tmpErrs, fieldIsEmpty(acct.Lname, "lname"))
 	tmpErrs = append(tmpErrs, fieldIsEmpty(acct.Address, "adress"))
@@ -99,14 +99,17 @@ func VetAllFields(acct Account) []error {
 	tmpErrs = append(tmpErrs, fieldHasNumbers(acct.Fname, "fname"))
 	tmpErrs = append(tmpErrs, fieldHasNumbers(acct.Lname, "lname"))
 
-	if strings.ContainsAny(acct.Username, symbolsFilter) {
-		rsltErr = append(rsltErr, fmt.Errorf("error:username:%w", errHasSymbols))
-	}
+	tmpErrs = append(tmpErrs, fieldHasSymbols(acct.Fname, "fname"))
+	tmpErrs = append(tmpErrs, fieldHasSymbols(acct.Lname, "lname"))
+	tmpErrs = append(tmpErrs, fieldHasSymbols(acct.Address, "adress"))
+	tmpErrs = append(tmpErrs, fieldHasSymbols(acct.Username, "username"))
 
-	}
-
+	symbolsFilter := "!@$_^%&*();/-+=\"'`~[]{}<|>"
+	errHasSymbols := errors.New("field can't contain any symbols")
 	if bytes.ContainsAny(acct.Password, symbolsFilter) {
-		rsltErr = append(rsltErr, fmt.Errorf("error:password:%w", errHasSymbols))
+		tmpErrs = append(tmpErrs, fmt.Errorf("error:password:%w", errHasSymbols))
+	}
+
 	for _, err := range tmpErrs {
 		if err != nil {
 			rsltErr = append(rsltErr, err)
