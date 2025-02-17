@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 16.6 (Homebrew)
--- Dumped by pg_dump version 16.6 (Homebrew)
+-- Dumped from database version 16.7 (Homebrew)
+-- Dumped by pg_dump version 16.7 (Homebrew)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -66,7 +66,7 @@ ALTER SEQUENCE public.posts_id_seq OWNED BY public.posts.id;
 
 CREATE TABLE public.user_account (
     id integer NOT NULL,
-    username character varying(16) NOT NULL,
+    email character varying(16) NOT NULL,
     password bytea NOT NULL
 );
 
@@ -165,7 +165,7 @@ COPY public.posts (id, user_id, content, number_comments, number_reposts, number
 -- Data for Name: user_account; Type: TABLE DATA; Schema: public; Owner: <username>
 --
 
-COPY public.user_account (id, username, password) FROM stdin;
+COPY public.user_account (id, email, password) FROM stdin;
 \.
 
 
@@ -235,7 +235,7 @@ ALTER TABLE ONLY public.user_account
 --
 
 ALTER TABLE ONLY public.user_account
-    ADD CONSTRAINT user_account_username_key UNIQUE (username);
+    ADD CONSTRAINT user_account_username_key UNIQUE (email);
 
 
 --
