@@ -64,7 +64,15 @@ func fieldIsEmpty(val, fieldname string) error {
 	return rsltErr
 }
 
+// checks an account field for any numbers and returns a slice of errors
+func fieldHasNumbers(val, fieldname string) error {
+	errHasNums := errors.New("field can't contain any numbers")
+	var rsltErr error
+	if strings.ContainsAny(val, "0123456789") {
+		rsltErr = fmt.Errorf("error:%s:%w", fieldname, errHasNums)
 	}
+	return rsltErr
+}
 
 	if strings.ContainsAny(acct.Lname, symbolsFilter) {
 		rsltErr = append(rsltErr, fmt.Errorf("error:lname:%w", errHasSymbols))
@@ -88,6 +96,8 @@ func VetAllFields(acct Account) []error {
 	tmpErrs = append(tmpErrs, fieldIsEmpty(acct.Username, "username"))
 	tmpErrs = append(tmpErrs, fieldIsEmpty(string(acct.Password), "password"))
 
+	tmpErrs = append(tmpErrs, fieldHasNumbers(acct.Fname, "fname"))
+	tmpErrs = append(tmpErrs, fieldHasNumbers(acct.Lname, "lname"))
 
 	if strings.ContainsAny(acct.Username, symbolsFilter) {
 		rsltErr = append(rsltErr, fmt.Errorf("error:username:%w", errHasSymbols))
