@@ -53,30 +53,17 @@ func encryptPassword(s []byte) ([]byte, error) {
 	return hash, err
 }
 
-func VetAllFields(acct Account) []error {
-
+// function for wrapping a bunch of empty field errors
+// and returning them as a slice
+func fieldIsEmpty(val, fieldname string) error {
 	errEmptyField := errors.New("field is empty")
-	errHasNums := errors.New("field can't contain any numbers")
-	errHasSymbols := errors.New("field can't contain any symbols")
-	symbolsFilter := "!@$_^%&*();/-+=\"'`~[]{}<|>"
-
-	var rsltErr []error
-
-	if acct.Fname == "" {
-		rsltErr = append(rsltErr, fmt.Errorf("error:fname:%w", errEmptyField))
+	var rsltErr error
+	if val == "" || len(val) == 0 {
+		rsltErr = fmt.Errorf("error:%s:%w", fieldname, errEmptyField)
 	}
+	return rsltErr
+}
 
-	if strings.ContainsAny(acct.Fname, symbolsFilter) {
-		rsltErr = append(rsltErr, fmt.Errorf("error:fname:%w", errHasSymbols))
-	}
-
-	// first name can't have any numbers
-	if strings.ContainsAny(acct.Fname, "0123456789") {
-		rsltErr = append(rsltErr, fmt.Errorf("error:fname:%w", errHasNums))
-	}
-
-	if acct.Lname == "" {
-		rsltErr = append(rsltErr, fmt.Errorf("error:lname:%w", errEmptyField))
 	}
 
 	if strings.ContainsAny(acct.Lname, symbolsFilter) {
@@ -88,28 +75,32 @@ func VetAllFields(acct Account) []error {
 		rsltErr = append(rsltErr, fmt.Errorf("error:lname:%w", errHasNums))
 	}
 
-	if acct.Address == "" {
-		rsltErr = append(rsltErr, fmt.Errorf("error:address:%w", errEmptyField))
-	}
+func VetAllFields(acct Account) []error {
+	var tmpErrs []error
+	var rsltErr []error
 
 	if strings.ContainsAny(acct.Address, symbolsFilter) {
 		rsltErr = append(rsltErr, fmt.Errorf("error:address:%w", errHasSymbols))
 	}
+	tmpErrs = append(tmpErrs, fieldIsEmpty(acct.Fname, "fname"))
+	tmpErrs = append(tmpErrs, fieldIsEmpty(acct.Lname, "lname"))
+	tmpErrs = append(tmpErrs, fieldIsEmpty(acct.Address, "adress"))
+	tmpErrs = append(tmpErrs, fieldIsEmpty(acct.Username, "username"))
+	tmpErrs = append(tmpErrs, fieldIsEmpty(string(acct.Password), "password"))
 
-	if acct.Username == "" {
-		rsltErr = append(rsltErr, fmt.Errorf("error:username:%w", errEmptyField))
-	}
 
 	if strings.ContainsAny(acct.Username, symbolsFilter) {
 		rsltErr = append(rsltErr, fmt.Errorf("error:username:%w", errHasSymbols))
 	}
 
-	if len(acct.Password) == 0 {
-		rsltErr = append(rsltErr, fmt.Errorf("error:passsword:%w", errEmptyField))
 	}
 
 	if bytes.ContainsAny(acct.Password, symbolsFilter) {
 		rsltErr = append(rsltErr, fmt.Errorf("error:password:%w", errHasSymbols))
+	for _, err := range tmpErrs {
+		if err != nil {
+			rsltErr = append(rsltErr, err)
+		}
 	}
 
 	return rsltErr
