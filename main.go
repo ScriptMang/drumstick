@@ -55,6 +55,7 @@ func accountCreation(c echo.Context) error {
 
 	rsltErr := accts.VetAllFields(newAcct)
 	if len(rsltErr) > 0 {
+		c.Logger().Error(rsltErr)
 		return echo.NewHTTPError(http.StatusBadRequest, errors.Join(rsltErr...))
 	}
 
