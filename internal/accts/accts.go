@@ -86,6 +86,35 @@ func fieldHasSymbols(val, fieldname string) error {
 	return rsltErr
 }
 
+// performs mult. error checks to validate an
+// email address and returns the final error
+func vetEmailAddress(email string) error {
+	var tmpErrs []error
+
+	reqSymbols := "@"
+	endingAddrs := []string{".com", ".org", ".net"}
+	reqNums := "0123456789"
+	errReqNums := errors.New("email requires numbers.")
+	errReqSymbol := errors.New("email is missing an '@' symbol.")
+	errReqEndingAddr := errors.New("email doesn't match any of the ending addresses.")
+
+	if strings.ContainsAny(email, reqNums) {
+		tmpErrs = append(tmpErrs, fmt.Errorf("error:email:%w", errReqNums))
+	}
+
+	if strings.ContainsAny(email, reqSymbols) {
+		tmpErrs = append(tmpErrs, fmt.Errorf("error:email:%w", errReqSymbol))
+	}
+
+	for _, endingAddr := range endingAddrs {
+		if strings.ContainsAny(email, endingAddr) {
+			tmpErrs = append(tmpErrs, fmt.Errorf("error:email:%w", errReqEndingAddr))
+		}
+	}
+
+	return errors.Join(tmpErrs...)
+}
+
 func VetAllFields(acct Account) []error {
 	var tmpErrs []error
 	var rsltErr []error
@@ -102,7 +131,7 @@ func VetAllFields(acct Account) []error {
 	tmpErrs = append(tmpErrs, fieldHasSymbols(acct.Fname, "fname"))
 	tmpErrs = append(tmpErrs, fieldHasSymbols(acct.Lname, "lname"))
 	tmpErrs = append(tmpErrs, fieldHasSymbols(acct.Address, "adress"))
-	tmpErrs = append(tmpErrs, fieldHasSymbols(acct.Username, "username"))
+	tmpErrs = append(tmpErrs, vetEmailAddress(acct.Email))
 
 	symbolsFilter := "!@$_^%&*();/-+=\"'`~[]{}<|>"
 	errHasSymbols := errors.New("field can't contain any symbols")
