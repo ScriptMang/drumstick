@@ -209,8 +209,8 @@ func addUserAcct(acct *Account) error {
 
 	var tempID int
 	err = db.QueryRow(ctx,
-		`INSERT INTO user_account(username, password) VALUES($1, $2) RETURNING id`,
-		acct.Username, acct.Password,
+		`INSERT INTO user_account(email, password) VALUES($1, $2) RETURNING id`,
+		acct.Email, acct.Password,
 	).Scan(&tempID)
 
 	if err != nil {
