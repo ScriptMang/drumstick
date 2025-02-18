@@ -93,7 +93,7 @@ func VetAllFields(acct Account) []error {
 	tmpErrs = append(tmpErrs, fieldIsEmpty(acct.Fname, "fname"))
 	tmpErrs = append(tmpErrs, fieldIsEmpty(acct.Lname, "lname"))
 	tmpErrs = append(tmpErrs, fieldIsEmpty(acct.Address, "adress"))
-	tmpErrs = append(tmpErrs, fieldIsEmpty(acct.Username, "username"))
+	tmpErrs = append(tmpErrs, fieldIsEmpty(acct.Email, "email"))
 	tmpErrs = append(tmpErrs, fieldIsEmpty(string(acct.Password), "password"))
 
 	tmpErrs = append(tmpErrs, fieldHasNumbers(acct.Fname, "fname"))
