@@ -50,7 +50,7 @@ func accountCreation(c echo.Context) error {
 	newAcct.Fname = c.FormValue("fname")
 	newAcct.Lname = c.FormValue("lname")
 	newAcct.Address = c.FormValue("address")
-	newAcct.Username = c.FormValue("username")
+	newAcct.Email = c.FormValue("email")
 	newAcct.Password = []byte(c.FormValue("password"))
 
 	rsltErr := accts.VetAllFields(newAcct)
@@ -81,7 +81,7 @@ func login(c echo.Context) error {
 }
 
 func vetLogin(c echo.Context) error {
-	usr := c.FormValue("username")
+	usr := c.FormValue("email")
 	pswd := c.FormValue("password")
 
 	rsltErr := accts.VetUserCreds(usr, pswd)
