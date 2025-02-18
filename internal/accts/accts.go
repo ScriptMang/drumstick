@@ -98,18 +98,25 @@ func vetEmailAddress(email string) error {
 	errReqSymbol := errors.New("email is missing an '@' symbol.")
 	errReqEndingAddr := errors.New("email doesn't match any of the ending addresses.")
 
-	if strings.ContainsAny(email, reqNums) {
+	// the email must have contain a numer
+	if !strings.ContainsAny(email, reqNums) {
 		tmpErrs = append(tmpErrs, fmt.Errorf("error:email:%w", errReqNums))
 	}
 
-	if strings.ContainsAny(email, reqSymbols) {
+	// the  email must have an @ symbol
+	if !strings.ContainsAny(email, reqSymbols) {
 		tmpErrs = append(tmpErrs, fmt.Errorf("error:email:%w", errReqSymbol))
 	}
 
+	validEmailOrg := false
 	for _, endingAddr := range endingAddrs {
-		if strings.ContainsAny(email, endingAddr) {
-			tmpErrs = append(tmpErrs, fmt.Errorf("error:email:%w", errReqEndingAddr))
+		if strings.Contains(email, endingAddr) {
+			validEmailOrg = true
 		}
+	}
+
+	if !validEmailOrg {
+		tmpErrs = append(tmpErrs, fmt.Errorf("error:email:%w", errReqEndingAddr))
 	}
 
 	return errors.Join(tmpErrs...)
