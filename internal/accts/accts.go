@@ -227,12 +227,12 @@ func addUserAcct(acct *Account) error {
 }
 
 // get the user's id from their username
-func UserIDByUsername(username string) (int, error) {
+func UserIDByEmail(email string) (int, error) {
 	ctx, db := backend.Connect()
 	defer db.Close()
 
 	var possibleUserID []*int
-	err := pgxscan.Select(ctx, db, &possibleUserID, `SELECT id FROM user_account WHERE username = $1`, username)
+	err := pgxscan.Select(ctx, db, &possibleUserID, `SELECT id FROM user_account WHERE username = $1`, email)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return 0, fmt.Errorf("error: resource not found: id does not exist")
