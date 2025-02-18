@@ -121,39 +121,39 @@ func VetAllFields(acct Account) []error {
 
 // check user credentials for empty fields
 // and append the errors to the err slice
-func VetUserCreds(username, password string) []error {
-	emptyUsername := errors.New("username can't be empty")
+func VetUserCreds(email, password string) []error {
+	emptyEmail := errors.New("email can't be empty")
 	emptyPswd := errors.New("password can't be empty")
-	usernameTooShort := errors.New("username is too short")
-	usernameTooLong := errors.New("username is too long")
+	emailTooShort := errors.New("email is too short")
+	emailTooLong := errors.New("email is too long")
 	pswdTooShort := errors.New("password is too short")
 	pswdTooLong := errors.New("password is too long")
 	missingCapitalLetter := errors.New("password is missing a capital letter")
 	missingNumber := errors.New("password is missing a capital letter")
-	punctInUsername := errors.New("no special punctuation in the username")
-	symbolsInUsername := errors.New("no special symbols in the username")
+	punctInEmail := errors.New("no special punctuation in the email")
+	symbolsInEmail := errors.New("no special symbols in the email")
 
 	var rsltErr []error
 	switch {
-	case username == "":
-		rsltErr = append(rsltErr, emptyUsername)
-	case len(username) < 15:
-		rsltErr = append(rsltErr, usernameTooShort)
-	case len(username) > 15:
-		rsltErr = append(rsltErr, usernameTooLong)
+	case email == "":
+		rsltErr = append(rsltErr, emptyEmail)
+	case len(email) < 15:
+		rsltErr = append(rsltErr, emailTooShort)
+	case len(email) > 15:
+		rsltErr = append(rsltErr, emailTooLong)
 	}
 
-	// check for punct in username
-	punct := " ?!;:,."
-	userHasPunct := strings.ContainsAny(username, punct)
-	if userHasPunct {
-		rsltErr = append(rsltErr, punctInUsername)
+	// check for punct in email
+	punct := " ?!;:,"
+	emailHasPunct := strings.ContainsAny(email, punct)
+	if emailHasPunct {
+		rsltErr = append(rsltErr, punctInEmail)
 	}
-	// check for symbols in  username
-	symbols := "@#$%^&*[]{}()%|\\`~"
-	userHasSymbols := strings.ContainsAny(username, symbols)
+	// check for symbols in  email
+	symbols := "#$%^&*[]{}()%|\\`~"
+	userHasSymbols := strings.ContainsAny(email, symbols)
 	if userHasSymbols {
-		rsltErr = append(rsltErr, symbolsInUsername)
+		rsltErr = append(rsltErr, symbolsInEmail)
 	}
 
 	switch {
