@@ -272,7 +272,7 @@ func CreateAcct(acct Account) (string, error) {
 	}
 
 	var userID int
-	userID, err = UserIDByUsername(acct.Username)
+	userID, err = UserIDByEmail(acct.Email)
 	if err != nil {
 		return "", fmt.Errorf("error: %w", err)
 	}
