@@ -66,7 +66,7 @@ ALTER SEQUENCE public.posts_id_seq OWNED BY public.posts.id;
 
 CREATE TABLE public.user_account (
     id integer NOT NULL,
-    email character varying(16) NOT NULL,
+    email character varying(30) NOT NULL,
     password bytea NOT NULL
 );
 
