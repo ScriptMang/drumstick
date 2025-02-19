@@ -128,7 +128,7 @@ func VetAllFields(acct Account) []error {
 
 	tmpErrs = append(tmpErrs, fieldIsEmpty(acct.Fname, "fname"))
 	tmpErrs = append(tmpErrs, fieldIsEmpty(acct.Lname, "lname"))
-	tmpErrs = append(tmpErrs, fieldIsEmpty(acct.Address, "adress"))
+	tmpErrs = append(tmpErrs, fieldIsEmpty(acct.Address, "address"))
 	tmpErrs = append(tmpErrs, fieldIsEmpty(acct.Email, "email"))
 	tmpErrs = append(tmpErrs, fieldIsEmpty(string(acct.Password), "password"))
 
@@ -137,7 +137,7 @@ func VetAllFields(acct Account) []error {
 
 	tmpErrs = append(tmpErrs, fieldHasSymbols(acct.Fname, "fname"))
 	tmpErrs = append(tmpErrs, fieldHasSymbols(acct.Lname, "lname"))
-	tmpErrs = append(tmpErrs, fieldHasSymbols(acct.Address, "adress"))
+	tmpErrs = append(tmpErrs, fieldHasSymbols(acct.Address, "address"))
 	tmpErrs = append(tmpErrs, vetEmailAddress(acct.Email))
 
 	symbolsFilter := "!@$_^%&*();/-+=\"'`~[]{}<|>"
