@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/subtle"
 	"errors"
 	"fmt"
 	"html/template"
@@ -92,12 +93,21 @@ func vetLogin(c echo.Context) error {
 	return c.Render(http.StatusOK, "posts", "My Feed")
 }
 
+func basicAuthValidator(email, password string, c echo.Context) (bool, error) {
+	if subtle.ConstantTimeCompare([]byte(email), []byte("email")) == 1 &&
+		subtle.ConstantTimeCompare([]byte(password), "password") == 1 {
+		return true, nil
+	}
+	return false, nil
+}
+
 func main() {
 	tm := &TemplateManager{
 		templates: template.Must(template.ParseGlob("ui/html/pages/*[^#?!|].tmpl")),
 	}
 	router := echo.New()
 	router.Use(middleware.SecureWithConfig(middleware.DefaultSecureConfig))
+	router.Use(middleware.BasicAuth(basicAuthValidator))
 	router.Renderer = tm
 	router.GET("/", homePage)
 	router.GET("/signup", signUp)
