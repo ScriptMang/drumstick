@@ -218,6 +218,12 @@ func VetUserCreds(email, password string) []error {
 	return rsltErr
 }
 
+// compare the provided user email ,and password
+// hash to those that exist in the databse
+func CompareUserCreds(email string, hash []byte) string {
+	return ""
+}
+
 // add user account to the database
 func addUserAcct(acct *Account) error {
 	ctx, db := backend.Connect()
