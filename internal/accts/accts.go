@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"log"
 	"scriptmang/drumstick/internal/backend"
 	"strings"
 
@@ -216,6 +217,30 @@ func VetUserCreds(email, password string) []error {
 	}
 
 	return rsltErr
+}
+
+// returns a slice of all the emails in the database
+func readEmails(tgt string) []string {
+	ctx, db := backend.Connect()
+	defer db.Close()
+
+	var emails []string
+	err := db.QueryRow(ctx,
+		`SELECT * FROM user_profile WHERE email = $1`,
+		tgt,
+	).Scan(&emails)
+
+	if errors.Is(err, pgx.ErrNoRows) {
+		log.Println(err)
+		return emails
+	}
+
+	if err != nil {
+		log.Println(err)
+		return emails
+	}
+
+	return emails
 }
 
 // compare the provided user email ,and password
