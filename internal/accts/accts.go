@@ -220,24 +220,25 @@ func VetUserCreds(email, password string) []error {
 }
 
 // returns a slice of all the emails in the database
-func readEmails(tgt string) []string {
+func readEmails() []string {
 	ctx, db := backend.Connect()
 	defer db.Close()
 
-	var emails []string
-	err := db.QueryRow(ctx,
-		`SELECT * FROM user_profile WHERE email = $1`,
-		tgt,
-	).Scan(&emails)
-
+	var users []*UserAccount
+	err := pgxscan.Select(ctx, db, &users, `SELECT * FROM user_account`)
 	if errors.Is(err, pgx.ErrNoRows) {
 		log.Println(err)
-		return emails
+		return []string{""}
 	}
 
 	if err != nil {
 		log.Println(err)
-		return emails
+		return []string{""}
+	}
+
+	var emails []string
+	for _, user := range users {
+		emails = append(emails, user.Email)
 	}
 
 	return emails
@@ -245,8 +246,65 @@ func readEmails(tgt string) []string {
 
 // compare the provided user email ,and password
 // hash to those that exist in the databse
-func CompareUserCreds(email string, hash []byte) string {
-	return ""
+func CompareUserCreds(email string, pswd string) error {
+	lstEmails := readEmails()
+
+	emailIsReal := false
+	for _, target := range lstEmails {
+		if email == target {
+			emailIsReal = true
+			break
+		}
+	}
+
+	if !emailIsReal {
+		errEmailNotFound := errors.New("error: email does not exist")
+		log.Println(errEmailNotFound)
+		return errEmailNotFound
+	}
+
+	// need pswd hash from database
+	// compare to one in database
+
+	ctx, db := backend.Connect()
+	defer db.Close()
+
+	if len(pswd) < 15 {
+		errPswdTooShort := errors.New("error: password is too short, password should be at minimum 15 or more")
+		log.Println(errPswdTooShort)
+		return errPswdTooShort
+	}
+
+	var users []*UserAccount
+	err := pgxscan.Select(ctx, db, &users, `Select * FROM user_account`)
+
+	if err != nil {
+		errFailedDBEntry := errors.New("database error: couldn’t connect to drumstick")
+		log.Println(errFailedDBEntry)
+		return errFailedDBEntry
+	}
+
+	if len(users) == 0 {
+		errNoRowFound := errors.New("query error: user accounts are empty")
+		log.Println(errNoRowFound)
+		return errNoRowFound
+	}
+
+	hashIsReal := false
+	for _, user := range users {
+		if bcrypt.CompareHashAndPassword(user.Password, []byte(pswd)) == nil {
+			hashIsReal = true
+			break
+		}
+	}
+
+	if !hashIsReal {
+		errMismatchedHash := errors.New("password mismatch error: hash does not match password")
+		log.Println(errMismatchedHash)
+		return errMismatchedHash
+	}
+
+	return nil
 }
 
 // add user account to the database

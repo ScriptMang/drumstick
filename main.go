@@ -84,9 +84,9 @@ func vetLogin(c echo.Context) error {
 	usr := c.FormValue("email")
 	pswd := c.FormValue("password")
 
-	rsltErr := accts.VetUserCreds(usr, pswd)
-	if len(rsltErr) > 0 {
-		return echo.NewHTTPError(http.StatusBadRequest, errors.Join(rsltErr...))
+	rsltErr := accts.CompareUserCreds(usr, pswd)
+	if rsltErr != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, rsltErr)
 	}
 
 	return c.Render(http.StatusOK, "posts", "My Feed")
