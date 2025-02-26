@@ -9,6 +9,7 @@ import (
 	"net/http"
 
 	"scriptmang/drumstick/internal/accts"
+	"scriptmang/drumstick/internal/posts"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -90,6 +91,11 @@ func vetLogin(c echo.Context) error {
 	}
 
 	return c.Render(http.StatusOK, "posts", "My Feed")
+}
+
+func addPosts(c echo.Context) {
+	mypost := c.FormValue("content")
+	posts.CreatePosts()
 }
 
 func main() {

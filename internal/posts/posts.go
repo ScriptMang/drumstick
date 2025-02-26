@@ -1,0 +1,5 @@
+package posts
+
+func CreatePosts() {
+
+}
