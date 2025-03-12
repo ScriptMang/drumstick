@@ -20,12 +20,11 @@ type Post struct {
 	NumbBookmarks int    `json:"number_bookmarks" form:"number_bookmarks"`
 }
 
-func CreatePosts(userPost string) ([]*Post, error) {
+func CreatePosts(userPost, email string) ([]*Post, error) {
 	ctx, db := backend.Connect()
 	defer db.Close()
 
 	// need get user id of the poster
-	email := "temp@googly.com"
 	uid, uidErr := accts.UserIDByEmail(email)
 
 	if uidErr != nil {
@@ -44,10 +43,8 @@ func CreatePosts(userPost string) ([]*Post, error) {
     ) VALUES($1,$2,$3,$4,$5,$6,$7)`, uid, userPost, 0, 0, 0, 0, 0).Scan(&tempPost)
 
 	// check list all the errs
-
 	if err != nil {
 		return nil, fmt.Errorf("error: %w", err)
 	}
-
 	return tempPost, nil
 }
