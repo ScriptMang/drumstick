@@ -348,11 +348,13 @@ func UserIDByEmail(email string) (int, error) {
 
 	var possibleUserID []*int
 	err := pgxscan.Select(ctx, db, &possibleUserID, `SELECT id FROM user_account WHERE email = $1`, email)
+
+	if errors.Is(err, pgx.ErrNoRows) {
+		return 0, errors.New("error: resource not found: id does not exist")
+	}
+
 	if err != nil {
-		if errors.Is(err, pgx.ErrNoRows) {
-			return 0, fmt.Errorf("error: resource not found: id does not exist")
-		}
-		return 0, fmt.Errorf("error: %v", err)
+		return 0, fmt.Errorf("error: %w", err)
 	}
 	userID := *possibleUserID[0]
 	return userID, nil
