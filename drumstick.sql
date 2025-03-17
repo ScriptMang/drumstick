@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 16.7 (Homebrew)
--- Dumped by pg_dump version 16.7 (Homebrew)
+-- Dumped from database version 16.8 (Homebrew)
+-- Dumped by pg_dump version 16.8 (Homebrew)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -61,13 +61,27 @@ ALTER SEQUENCE public.posts_id_seq OWNED BY public.posts.id;
 
 
 --
+-- Name: sessions; Type: TABLE; Schema: public; Owner: <username>
+--
+
+CREATE TABLE public.sessions (
+    token character(43) NOT NULL,
+    data bytea NOT NULL,
+    expiry timestamp(6) without time zone NOT NULL
+);
+
+
+ALTER TABLE public.sessions OWNER TO <username>;
+
+--
 -- Name: user_account; Type: TABLE; Schema: public; Owner: <username>
 --
 
 CREATE TABLE public.user_account (
     id integer NOT NULL,
     email character varying(30) NOT NULL,
-    password bytea NOT NULL
+    password bytea NOT NULL,
+    followers character varying[]
 );
 
 
@@ -162,10 +176,18 @@ COPY public.posts (id, user_id, content, number_comments, number_reposts, number
 
 
 --
+-- Data for Name: sessions; Type: TABLE DATA; Schema: public; Owner: <username>
+--
+
+COPY public.sessions (token, data, expiry) FROM stdin;
+\.
+
+
+--
 -- Data for Name: user_account; Type: TABLE DATA; Schema: public; Owner: <username>
 --
 
-COPY public.user_account (id, email, password) FROM stdin;
+COPY public.user_account (id, email, password, followers) FROM stdin;
 \.
 
 
@@ -188,14 +210,14 @@ SELECT pg_catalog.setval('public.posts_id_seq', 1, false);
 -- Name: user_account_id_seq; Type: SEQUENCE SET; Schema: public; Owner: <username>
 --
 
-SELECT pg_catalog.setval('public.user_account_id_seq', 1, false);
+SELECT pg_catalog.setval('public.user_account_id_seq', 1, true);
 
 
 --
 -- Name: user_profile_id_seq; Type: SEQUENCE SET; Schema: public; Owner: <username>
 --
 
-SELECT pg_catalog.setval('public.user_profile_id_seq', 1, false);
+SELECT pg_catalog.setval('public.user_profile_id_seq', 1, true);
 
 
 --
@@ -212,6 +234,14 @@ ALTER TABLE ONLY public.posts
 
 ALTER TABLE ONLY public.posts
     ADD CONSTRAINT posts_user_id_key UNIQUE (user_id);
+
+
+--
+-- Name: sessions sessions_pkey; Type: CONSTRAINT; Schema: public; Owner: <username>
+--
+
+ALTER TABLE ONLY public.sessions
+    ADD CONSTRAINT sessions_pkey PRIMARY KEY (token);
 
 
 --
@@ -260,6 +290,13 @@ ALTER TABLE ONLY public.user_profile
 
 ALTER TABLE ONLY public.user_profile
     ADD CONSTRAINT user_profile_user_id_key UNIQUE (user_id);
+
+
+--
+-- Name: sessions_expiry_idx; Type: INDEX; Schema: public; Owner: <username>
+--
+
+CREATE INDEX sessions_expiry_idx ON public.sessions USING btree (expiry);
 
 
 --
