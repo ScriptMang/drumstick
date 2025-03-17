@@ -1,4 +1,4 @@
-{{define "posts"}}
+{{define "refresh"}}
 <!DOCTYPE html>
 <html lang='en'>
   <head>
@@ -14,7 +14,7 @@
    <p> This is the User's Posts page</p>
    <a href="/"> sign out</a><br>
  
-   <form action= "/refresh" method="post">   
+   <form action= "posts/view/1" method="post">   
      <label for="content">write post</label><br>
      <textarea id="content" name="content" rows="8" cols="50" maxlength="140"></textarea><br>
       <input type="submit" value="submit">
