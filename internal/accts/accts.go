@@ -23,9 +23,10 @@ type UserProfile struct {
 }
 
 type UserAccount struct {
-	ID       int    `json:"id" form:"id"`
-	Email    string `json:"email" form:"email"`
-	Password []byte `json:"password" form:"password"`
+	ID        int      `json:"id" form:"id"`
+	Email     string   `json:"email" form:"email"`
+	Password  []byte   `json:"password" form:"password"`
+	Followers []string `json:"followers" form:"followers"`
 }
 
 type Account struct {
