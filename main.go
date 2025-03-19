@@ -18,10 +18,6 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 )
 
-type respBody struct {
-	msg string
-}
-
 type TemplateManager struct {
 	templates *template.Template
 }
@@ -45,7 +41,6 @@ func signUp(c echo.Context) error {
 }
 
 func accountCreation(c echo.Context) error {
-	var resp respBody
 	var newAcct accts.Account
 
 	newAcct.Fname = c.FormValue("fname")
@@ -60,15 +55,14 @@ func accountCreation(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, errors.Join(rsltErr...))
 	}
 
-	msg, err := accts.CreateAcct(newAcct)
+	_, err := accts.CreateAcct(newAcct)
 	if err != nil {
 		fmt.Println(err.Error())
 		return err
 	}
 
-	resp.msg = msg
 	// fmt.Println(resp)
-	return c.Render(http.StatusOK, "view", resp)
+	return c.Render(http.StatusOK, "posts", "Add Posts to Your Feed")
 }
 
 func homePage(c echo.Context) error {
