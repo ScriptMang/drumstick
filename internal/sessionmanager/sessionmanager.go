@@ -65,14 +65,24 @@ func CreateToken(usr string) (string, error) {
 }
 
 // adds user token to sessions table in database
-func AddToken(tk *jwt.Token) error {
+func AddToken(c echo.Context) error {
 	ctx, db := backend.Connect()
 	defer db.Close()
 
-	// need to move custom claims to its own pkg
-	claims, ok := tk.Claims.(UserCustomClaims)
-	if !ok {
-		return errors.New("error: failed conversion for custom claim")
+	// get user's jwt
+	tk, tokenExists := c.Get("user").(*jwt.Token)
+	if !tokenExists {
+		return errors.New("error: failed conversion for jwt")
+	}
+
+	claims, claimExists := tk.Claims.(jwt.MapClaims)
+	if !claimExists {
+		return errors.New("error: failed conversion for to map claims")
+	}
+
+	email, emailExists := claims["Email"].(string)
+	if !emailExists {
+		return errors.New("error: failed to retreive to email from claim ")
 	}
 
 	expTime, err := tk.Claims.GetExpirationTime()
@@ -86,7 +96,7 @@ func AddToken(tk *jwt.Token) error {
 	_, err = db.Exec(
 		ctx,
 		`INSERT INTO sessions (token, data, expiry) VALUES($1, $2, $3)`,
-		tk, claims.Email, expTime.Time,
+		tk, email, expTime.Time,
 	)
 
 	// handle multiple errs when insertion goes wrong

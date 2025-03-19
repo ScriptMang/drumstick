@@ -89,6 +89,11 @@ func vetLogin(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, err)
 	}
 
+	err = sessionmanager.AddToken(c)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err)
+	}
+
 	return c.Render(http.StatusOK, "posts", echo.Map{
 		"token": t,
 	})
