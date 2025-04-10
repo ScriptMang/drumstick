@@ -2,7 +2,6 @@ package main
 
 import (
 	"errors"
-	"fmt"
 	"html/template"
 	"io"
 	"log"
@@ -58,7 +57,7 @@ func accountCreation(c echo.Context) error {
 
 	_, err := accts.CreateAcct(newAcct)
 	if err != nil {
-		fmt.Println(err.Error())
+		log.Println(err.Error())
 		return err
 	}
 
@@ -110,10 +109,6 @@ func vetLogin(c echo.Context) error {
 	}
 
 	c.SetCookie(ck)
-	// err = sessionmanager.AddToken(t, []byte(os.Getenv("HMAC_SECRET")), c)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err)
-	}
 	c.Request().AddCookie(ck)
 	return c.Render(http.StatusOK, "posts", "Add Posts to Your Feed")
 }
@@ -132,19 +127,19 @@ func restricted(c echo.Context) error {
 
 	// returns an http error on failure
 	if errors.Is(err, jwt.ErrTokenExpired) {
-		return errors.New("Token Expired")
+		return errors.New("token error: token Expired")
 	}
 
 	if errors.Is(err, jwt.ErrSignatureInvalid) {
-		return errors.New("Token has an invalid signature")
+		return errors.New("token error: token has an invalid signature")
 	}
 
 	if errors.Is(err, jwt.ErrTokenRequiredClaimMissing) {
-		return errors.New("Token is missing required claims")
+		return errors.New("token error: token is missing required claims")
 	}
 
 	if errors.Is(err, jwt.ErrTokenSignatureInvalid) {
-		return errors.New("Token signature is invalid")
+		return errors.New("token error: token signature is invalid")
 	}
 
 	email := claims.Email
