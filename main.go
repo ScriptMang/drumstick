@@ -7,6 +7,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"os"
 
 	"scriptmang/drumstick/internal/accts"
 	"scriptmang/drumstick/internal/posts"
@@ -84,42 +85,81 @@ func vetLogin(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusUnauthorized, rsltErr)
 	}
 
-	t, err := sessionmanager.CreateToken(usr)
+	tk, err := sessionmanager.CreateToken(usr, c)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err)
 	}
 
-	err = sessionmanager.AddToken(c)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err)
-	}
-
-	return c.Render(http.StatusOK, "posts", echo.Map{
-		"token": t,
-	})
-}
-
-// this funct is only  for testing purpsos
-func restricted(c echo.Context) error {
-	email, err := sessionmanager.Email(c)
-
-	// returns an http error on failure
+	t, err := tk.SignedString([]byte(os.Getenv("HMAC_SECRET")))
 	if err != nil {
 		return err
 	}
 
-	return c.String(http.StatusOK, "Welcome "+email+"!")
+	expTime, expTimeErr := tk.Claims.GetExpirationTime()
+	if expTimeErr != nil {
+		return errors.New("error: failed to get expiration time")
+	}
+
+	ck := &http.Cookie{
+		Name:     "Token",
+		Value:    t,
+		Quoted:   false,
+		Expires:  expTime.Time,
+		HttpOnly: true,
+		SameSite: http.SameSiteLaxMode,
+	}
+
+	c.SetCookie(ck)
+	// err = sessionmanager.AddToken(t, []byte(os.Getenv("HMAC_SECRET")), c)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err)
+	}
+	c.Request().AddCookie(ck)
+	return c.Render(http.StatusOK, "posts", "Add Posts to Your Feed")
+}
+
+// this funct is only  for testing purpsos
+func restricted(c echo.Context) error {
+	t, err := c.Cookie("Token")
+	if err != nil {
+		return c.HTML(http.StatusUnauthorized,
+			"No authorization token",
+		)
+	}
+
+	c.Request().Header.Add("Authorization", "Bearer "+t.Value)
+	claims, err := sessionmanager.GetUserCustomClaims(t.Value, []byte(os.Getenv("HMAC_SECRET")))
+
+	// returns an http error on failure
+	if errors.Is(err, jwt.ErrTokenExpired) {
+		return errors.New("Token Expired")
+	}
+
+	if errors.Is(err, jwt.ErrSignatureInvalid) {
+		return errors.New("Token has an invalid signature")
+	}
+
+	if errors.Is(err, jwt.ErrTokenRequiredClaimMissing) {
+		return errors.New("Token is missing required claims")
+	}
+
+	if errors.Is(err, jwt.ErrTokenSignatureInvalid) {
+		return errors.New("Token signature is invalid")
+	}
+
+	email := claims.Email
+	return c.Render(http.StatusOK, "sample", "Welcome "+email+"!")
 }
 
 func addPosts(c echo.Context) error {
 	myPost := c.FormValue("content")
+	claims, retrievalErr := sessionmanager.GetUserCustomClaims("", []byte(os.Getenv("HMAC_SECRET")))
 
-	email, retrievalErr := sessionmanager.Email(c)
 	if retrievalErr != nil {
 		return retrievalErr
 	}
 
-	newPost, err := posts.CreatePosts(myPost, email)
+	newPost, err := posts.CreatePosts(myPost, claims.Email)
 
 	// handle errs where creating a post fails
 	if err != nil {
@@ -138,7 +178,10 @@ func main() {
 	}
 
 	router := echo.New()
+
 	router.Use(middleware.SecureWithConfig(middleware.DefaultSecureConfig))
+	router.Use(middleware.Logger())
+	router.Use(middleware.Recover())
 
 	router.Renderer = tm
 
@@ -149,17 +192,17 @@ func main() {
 	router.POST("/posts", vetLogin)
 	router.POST("/refresh", addPosts)
 
-	// Restricted group
 	r := router.Group("/restricted")
-
 	// Configure middleware with the custom claims type
 	config := echojwt.Config{
 		NewClaimsFunc: func(c echo.Context) jwt.Claims {
 			return new(sessionmanager.UserCustomClaims)
 		},
-		SigningKey: []byte("secret"),
+		SigningKey: []byte(os.Getenv("HMAC_SECRET")),
 	}
 	r.Use(echojwt.WithConfig(config))
+
+	// Restricted group
 	r.GET("", restricted)
 
 	router.Logger.Fatal(router.Start(":8080"))
