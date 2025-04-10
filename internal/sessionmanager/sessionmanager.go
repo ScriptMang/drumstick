@@ -3,6 +3,7 @@ package sessionmanager
 import (
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
 	"scriptmang/drumstick/internal/backend"
 	"time"
@@ -23,7 +24,29 @@ type UserCustomClaims struct {
 	jwt.RegisteredClaims
 }
 
-func Email(c echo.Context) (string, error) {
+func GetUserCustomClaims(t string, secretKey []byte) (*UserCustomClaims, error) {
+
+	token, err := jwt.ParseWithClaims(t, &UserCustomClaims{}, func(token *jwt.Token) (interface{}, error) {
+		// Validate the signing method
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+		}
+		return secretKey, nil
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	// Check if the token is valid
+	if claims, ok := token.Claims.(*UserCustomClaims); ok && token.Valid {
+		return claims, nil
+	}
+
+	return nil, fmt.Errorf("invalid token")
+
+}
+
+func GetEmail(c echo.Context) (string, error) {
 	user, ok := c.Get("user").(*jwt.Token)
 	if !ok {
 		return "", echo.NewHTTPError(http.StatusBadRequest, "error:sessionamanager: failed to convert to jwt token")
@@ -40,7 +63,7 @@ func Email(c echo.Context) (string, error) {
 }
 
 // adds user token to sessions table in database
-func CreateToken(usr string) (string, error) {
+func CreateToken(usr string, c echo.Context) (*jwt.Token, error) {
 	expirDate := time.Now().Add(time.Hour * 72).Unix()
 	claims := &UserCustomClaims{
 		Email:      usr,
@@ -50,54 +73,47 @@ func CreateToken(usr string) (string, error) {
 		},
 	}
 
-	fmt.Printf("foo: %v\n", claims.Email)
+	// fmt.Printf("foo: %v\n", claims.Email)
 
 	// Create token with claims
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
-	// Generate encoded token and send it as response.
-	t, err := token.SignedString([]byte("secret"))
-	if err != nil {
-		return "", err
-	}
-
-	return t, nil
+	return token, nil
 }
 
 // adds user token to sessions table in database
-func AddToken(c echo.Context) error {
-	ctx, db := backend.Connect()
+func AddToken(t string, secretKey []byte, c echo.Context) error {
+	_, db := backend.Connect()
 	defer db.Close()
 
-	// get user's jwt
-	tk, tokenExists := c.Get("user").(*jwt.Token)
-	if !tokenExists {
-		return errors.New("error: failed conversion for jwt")
+	// Generate encoded token and send it as response.
+
+	claims, err := GetUserCustomClaims(t, secretKey)
+	if err != nil {
+		return err
 	}
 
-	claims, claimExists := tk.Claims.(jwt.MapClaims)
-	if !claimExists {
-		return errors.New("error: failed conversion for to map claims")
+	email, err := GetEmail(c)
+	if err != nil {
+		return err
 	}
+	log.Printf("The value of the custom email claim is %s\n", email)
 
-	email, emailExists := claims["Email"].(string)
-	if !emailExists {
-		return errors.New("error: failed to retreive to email from claim ")
-	}
-
-	expTime, err := tk.Claims.GetExpirationTime()
+	expTime, err := claims.GetExpirationTime()
 
 	// err retrieving expiration time
 	if err != nil {
 		return errors.New("error: failed to get expiration time")
 	}
+	log.Printf("The value of the registered expr claim is %v\n", expTime)
+	return nil
 
 	// insert token
-	_, err = db.Exec(
-		ctx,
-		`INSERT INTO sessions (token, data, expiry) VALUES($1, $2, $3)`,
-		tk, email, expTime.Time,
-	)
+	// _, err = db.Exec(
+	// 	ctx,
+	// 	`INSERT INTO sessions (token, data, expiry) VALUES($1, $2, $3)`,
+	// 	t, email, expTime.Time,
+	// )
 
 	// handle multiple errs when insertion goes wrong
 	if err != nil {
