@@ -12,6 +12,8 @@ import (
 type Post struct {
 	ID            int    `json:"id" form:"id"`
 	UserID        int    `json:"user_id" form:"user_id"`
+	Sender        string `json:"sender" form:"sender"`
+	Receiver      string `json:"receiver" form:"receiver"`
 	Content       string `json:"content" form:"content"`
 	NumbComments  int    `json:"number_comments" form:"number_comments"`
 	NumbReposts   int    `json:"number_reposts" form:"number_reposts"`
@@ -37,7 +39,8 @@ func CreatePosts(userPost, email string) ([]*Post, error) {
 	// add posts to posts
 	var tempPost []*Post
 	err := db.QueryRow(ctx, `INSERT ONTO posts(
-            user_id, content,
+            user_id, sender,
+            receiver, content,
             number_comments, number_reposts,
             number_likes, number_views, number_bookmarks 
     ) VALUES($1,$2,$3,$4,$5,$6,$7)`, uid, userPost, 0, 0, 0, 0, 0).Scan(&tempPost)
