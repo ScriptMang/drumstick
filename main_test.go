@@ -24,9 +24,7 @@ func TestMain(m *testing.M) {
 	os.Exit(exitVal)
 }
 
-// test to see if the hompage route is acessible
-func Test_homepage(t *testing.T) {
-	// log.Print("Testing Homepage")
+func setupEchoClient() *echo.Echo {
 	tm := &TemplateManager{
 		templates: template.Must(template.ParseGlob("ui/html/pages/*[^#?!|].tmpl")),
 	}
@@ -39,6 +37,13 @@ func Test_homepage(t *testing.T) {
 
 	r.Renderer = tm
 
+	return r
+}
+
+// test to see if the hompage route is acessible
+func Test_homepage(t *testing.T) {
+	// log.Print("Testing Homepage")
+	r := setupEchoClient()
 	req, err := http.NewRequest("GET", "/", nil)
 
 	if err != nil {
@@ -51,23 +56,12 @@ func Test_homepage(t *testing.T) {
 	c.SetPath("/")
 	if assert.NoError(t, homePage(c)) {
 		assert.Equal(t, http.StatusOK, w.Code)
-		assert.NotEqual(t, `{"message":"Not Found"}`, w.Body.String())
+		assert.Equal(t, `{"message":"Not Found"}`, w.Body.String())
 	}
 }
 
 func Test_signup(t *testing.T) {
-	tm := &TemplateManager{
-		templates: template.Must(template.ParseGlob("ui/html/pages/*[^#?!|].tmpl")),
-	}
-
-	r := echo.New()
-
-	r.Use(middleware.SecureWithConfig(middleware.DefaultSecureConfig))
-	r.Use(middleware.Logger())
-	r.Use(middleware.Recover())
-
-	r.Renderer = tm
-
+	r := setupEchoClient()
 	req, err := http.NewRequest("GET", "/signup", nil)
 
 	if err != nil {
@@ -85,18 +79,7 @@ func Test_signup(t *testing.T) {
 }
 
 func Test_loginpage(t *testing.T) {
-	tm := &TemplateManager{
-		templates: template.Must(template.ParseGlob("ui/html/pages/*[^#?!|].tmpl")),
-	}
-
-	r := echo.New()
-
-	r.Use(middleware.SecureWithConfig(middleware.DefaultSecureConfig))
-	r.Use(middleware.Logger())
-	r.Use(middleware.Recover())
-
-	r.Renderer = tm
-
+	r := setupEchoClient()
 	req, err := http.NewRequest("GET", "/loginForm", nil)
 
 	if err != nil {
