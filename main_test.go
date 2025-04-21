@@ -109,35 +109,33 @@ func Test_accountcreation(t *testing.T) {
 	r := setupEchoClient()
 
 	tests := []struct {
-		testName, attribToBeTested, fname, lname, address, email string
-		password                                                 []byte
-
-		// expected                               string
+		testName, attribName, testType, fname, lname, address, email string
+		password                                                     []byte
 	}{
-		{"Empty Attributes", "fname", "", "", "409 Alistar Road", "jnp59@gmail.com", []byte("desertStorm432")},
-		{"No Spaces Found in Fname", "fname", " Jon", " Martin", "409 Alistar Road", "jnp59@gmail.com", []byte("desertStorm432")},
-		{"No Spaces Found in Lname", "lname", "Jon", " Martin", "409 Alistar Road", "jnp59@gmail.com", []byte("desertStorm432")},
-		{"No Spaces Found in Fname and Lname", "fname,lname", " Jon", " Martin", "409 Alistar Road", "jnp59@gmail.com", []byte("desertStorm432")},
-		{"No Symbols in Fname", "fname", "Jon@", "Martin", "409 Alistar Road", "jnp59@gmail.com", []byte("desertStorm432")},
-		{"No Symbols in Lname", "lname", "Jon", "@Martin", "409 Alistar Road", "jnp59@gmail.com", []byte("desertStorm432")},
-		{"No Numbers in Fname", "fname", "Jon3", "Martin", "409 Alistar Road", "jnp59@gmail.com", []byte("desertStorm432")},
-		{"No Numbers in Lname", "lname", "Jon", " Martin5", "409 Alistar Road", "jnp59@gmail.com", []byte("desertStorm432")},
-		{"No Symbols in Address", "address", "Jon", "Martin", "@409 Alistar Road", "jnp59@gmail.com", []byte("desertStorm432")},
-		{"Missing '@' Symbol in Email", "email", "Jon", "Martin", "409 Alistar Road", "jnp59@gmail.com", []byte("desertStorm432")},
-		{"Have at least One Capital Letter in Password", "password", "Jon", "Martin", "409 Alistar Road", "jnp59@gmail.com", []byte("desertstorm432")},
+		{"Empty Attributes", "fname", "emptyField", "", "Martin", "409 Alistar Road", "jnp59@gmail.com", []byte("desertStorm432")},
+		{"No Spaces Found in Fname", "fname", "emptyField", " Jon", " Martin", "409 Alistar Road", "jnp59@gmail.com", []byte("desertStorm432")},
+		{"No Spaces Found in Lname", "lname", "emptyField", "Jon", " Martin", "409 Alistar Road", "jnp59@gmail.com", []byte("desertStorm432")},
+		{"No Spaces Found in Fname and Lname", "fname,lname", "emptyField", " Jon", " Martin", "409 Alistar Road", "jnp59@gmail.com", []byte("desertStorm432")},
+		{"No Symbols in Fname", "fname", "noSymbs", "Jon@", "Martin", "409 Alistar Road", "jnp59@gmail.com", []byte("desertStorm432")},
+		{"No Symbols in Lname", "lname", "noSymbs", "Jon", "@Martin", "409 Alistar Road", "jnp59@gmail.com", []byte("desertStorm432")},
+		{"No Numbers in Fname", "fname", "noNums", "Jon3", "Martin", "409 Alistar Road", "jnp59@gmail.com", []byte("desertStorm432")},
+		{"No Numbers in Lname", "lname", "noNums", "Jon", " Martin5", "409 Alistar Road", "jnp59@gmail.com", []byte("desertStorm432")},
+		{"No Symbols in Address", "address", "noSymbs", "Jon", "Martin", "@409 Alistar Road", "jnp59@gmail.com", []byte("desertStorm432")},
+		{"Missing '@' Symbol in Email", "email", "no@", "Jon", "Martin", "409 Alistar Road", "jnp59@gmail.com", []byte("desertStorm432")},
+		{"Have at least One Capital Letter in Password", "password", "noCap", "Jon", "Martin", "409 Alistar Road", "jnp59@gmail.com", []byte("desertstorm432")},
 	}
 
-	// need table tests`
-
-	// empty field error
+	// field errors
 	errEmptyField := errors.New("field is empty")
+	errHasNums := errors.New("field can't contain any numbers")
+	errHasSymbols := errors.New("field can't contain any symbols")
 
 	// email errs
 	errReqNums := errors.New("email requires numbers.")
 	errReqSymbol := errors.New("email is missing an '@' symbol.")
 	errReqEndingAddr := errors.New("email doesn't match any of the ending addresses.")
 
-	// errs are placed together in json separated by '/n'
+	// range over table tests and validate the right errs are being thrown
 	for _, tt := range tests {
 		req, _ := http.NewRequest("POST", "/view", nil)
 		w := httptest.NewRecorder()
@@ -147,10 +145,19 @@ func Test_accountcreation(t *testing.T) {
 			tempAcct := accts.Account{Fname: tt.fname, Lname: tt.lname, Address: tt.address, Email: tt.email, Password: tt.password}
 			errLsts := accts.VetAllFields(tempAcct)
 			for _, tgtErr := range errLsts {
-				assert.EqualError(t, tgtErr, fmt.Sprintf("error:%s:%s", tt.attribToBeTested, errEmptyField.Error()))
-				assert.EqualError(t, tgtErr, errReqNums.Error())
-				assert.EqualError(t, tgtErr, errReqEndingAddr.Error())
-				assert.EqualError(t, tgtErr, errReqSymbol.Error())
+				switch tt.testType {
+				case "emptyField":
+					assert.EqualError(t, tgtErr, fmt.Sprintf("error:%s:%s", tt.attribName, errEmptyField.Error()))
+				case "noNums":
+					assert.EqualError(t, tgtErr, fmt.Sprintf("error:%s:%s", tt.attribName, errHasNums.Error()))
+				case "noSymbs":
+					assert.EqualError(t, tgtErr, fmt.Sprintf("error:%s:%s", tt.attribName, errHasSymbols.Error()))
+				case "email":
+					assert.EqualError(t, tgtErr, fmt.Sprintf("error:%s:%s", tt.attribName, errReqNums.Error()))
+					assert.EqualError(t, tgtErr, fmt.Sprintf("error:%s:%s", tt.attribName, errReqEndingAddr.Error()))
+					assert.EqualError(t, tgtErr, fmt.Sprintf("error:%s:%s", tt.attribName, errReqSymbol.Error()))
+				}
+
 			}
 		})
 	}
