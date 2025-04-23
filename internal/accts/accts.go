@@ -30,7 +30,7 @@ type UserAccount struct {
 }
 
 type Account struct {
-	ID       int    `json:"id" form:"id"`
+	ID       int    `json:"id,omitempty" form:"id"`
 	Fname    string `json:"fname" form:"fname"`
 	Lname    string `json:"lname" form:"lname"`
 	Address  string `json:"address" form:"address"`
