@@ -122,7 +122,6 @@ func restricted(c echo.Context) error {
 		)
 	}
 
-	c.Request().Header.Add("Authorization", "Bearer "+t.Value)
 	claims, err := sessionmanager.GetUserCustomClaims(t.Value, []byte(os.Getenv("HMAC_SECRET")))
 
 	// returns an http error on failure
@@ -193,7 +192,8 @@ func main() {
 		NewClaimsFunc: func(c echo.Context) jwt.Claims {
 			return new(sessionmanager.UserCustomClaims)
 		},
-		SigningKey: []byte(os.Getenv("HMAC_SECRET")),
+		SigningKey:  []byte(os.Getenv("HMAC_SECRET")),
+		TokenLookup: "cookie:Token",
 	}
 	r.Use(echojwt.WithConfig(config))
 
