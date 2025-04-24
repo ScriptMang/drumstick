@@ -15,7 +15,7 @@ Postman is also required to test routes and authentication.
 
 #### MacOS
 - On Macos: The easiest way to install the above programs is via homebrew pkg manager.
-  Open up the terminal and paste the following cmd `brew install go postgresql`.
+  Open up the terminal and type the cmd `brew install go postgresql`.
   
 #### Windows
 - On Windows: The easiest way to install the programs is to use the  chocolatey pkg manager.
@@ -27,13 +27,13 @@ Postman can be downloaded from the website.
 ### Setting Up Postgresql
 
 #### Macos
-- Start the postgresql server with `brew services start postgresql`
+- Open the terminal and start the postgresql server with `brew services start postgresql`
 
 - Included in the project is a sql dump file thats meant to be used to import the database.
   To import the database using the following command. 
   Note: make sure to replace the angular brackets in username with your actual database username.
   `createdb drumstick`.
-  `psql --username=\<user_name\> drumstick < drumstick.sql'`.
+  `psql --username=<user_name> drumstick < drumstick.sql'`.
  
 #### Windows
 
@@ -44,7 +44,7 @@ Postman can be downloaded from the website.
   To import the database using the following command. 
   Note: make sure to replace the angular brackets in username with your actual database username.
   `createdb drumstick`.
-  `psql --username=\<user_name\> drumstick < drumstick.sql'`.
+  `psql --username=<user_name> drumstick < drumstick.sql'`.
 
 ### Running the application
 
@@ -80,8 +80,8 @@ the fields and their errors are returned in json format.
 
 ### LoginForm
 
-The loginForm is a form page where users login; the request is at `GET localhost:8080/loginForm`.
-Once submitted, its authenticated at post route `Post localhost:8080/view`.
+The loginForm is a form page where users login; the request is at `GET` `localhost:8080/loginForm`.
+Once submitted, its authenticated at post route `Post` `localhost:8080/view`.
 
 
 ### Posts wip
