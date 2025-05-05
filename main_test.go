@@ -132,13 +132,13 @@ func Test_accountcreation(t *testing.T) {
 		errLst                       []error
 	}{
 		{"Empty Attributes", []string{"fname", "lname"}, "", "", "409 Alistar Road", "jnp59@gmail.com", []byte("desertStorm432"), []error{errEmptyField, errEmptyField}},
-		{"No Spaces Found in Fname", []string{"fname"}, " Jon", " Martin", "409 Alistar Road", "jnp59@gmail.com", []byte("desertStorm432"), []error{errHasPunct}},
+		{"No Spaces Found in Fname", []string{"fname"}, " Jon", "Martin", "409 Alistar Road", "jnp59@gmail.com", []byte("desertStorm432"), []error{errHasPunct}},
 		{"No Spaces Found in Lname", []string{"lname"}, "Jon", " Martin", "409 Alistar Road", "jnp59@gmail.com", []byte("desertStorm432"), []error{errHasPunct}},
 		{"No Spaces Found in Fname and Lname", []string{"fname", "lname"}, " Jon", " Martin", "409 Alistar Road", "jnp59@gmail.com", []byte("desertStorm432"), []error{errHasPunct, errHasPunct}},
 		{"No Symbols in Fname", []string{"fname"}, "Jon@", "Martin", "409 Alistar Road", "jnp59@gmail.com", []byte("desertStorm432"), []error{errHasSymbols}},
 		{"No Symbols in Lname", []string{"lname"}, "Jon", "@Martin", "409 Alistar Road", "jnp59@gmail.com", []byte("desertStorm432"), []error{errHasSymbols}},
 		{"No Numbers in Fname", []string{"fname"}, "Jon3", "Martin", "409 Alistar Road", "jnp59@gmail.com", []byte("desertStorm432"), []error{errHasNums}},
-		{"No Numbers in Lname", []string{"lname"}, "Jon", " Martin5", "409 Alistar Road", "jnp59@gmail.com", []byte("desertStorm432"), []error{errHasNums}},
+		{"No Numbers in Lname", []string{"lname"}, "Jon", "Martin5", "409 Alistar Road", "jnp59@gmail.com", []byte("desertStorm432"), []error{errHasNums}},
 		{"No Symbols in Address", []string{"address"}, "Jon", "Martin", "@409 Alistar Road", "jnp59@gmail.com", []byte("desertStorm432"), []error{errHasSymbols}},
 		{"Missing '@' Symbol in Email", []string{"email"}, "Jon", "Martin", "409 Alistar Road", "jnp59gmail.com", []byte("desertStorm432"), []error{errReqSymbol}},
 		{"Missing digits in Email", []string{"email", "email"}, "Jon", "Martin", "409 Alistar Road", "jnp@gmail.com", []byte("desertStorm432"), []error{errReqNums}},
