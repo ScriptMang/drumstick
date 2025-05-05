@@ -55,6 +55,15 @@ func fieldIsEmpty(val, fieldname string) error {
 	return rsltErr
 }
 
+func fieldHasPunct(val, fieldname string) error {
+	errHasPunct := errors.New("field has punctuation")
+	var rsltErr error
+	if strings.ContainsAny(val, " ?.!:,;") {
+		rsltErr = fmt.Errorf("error:%s:%w", fieldname, errHasPunct)
+	}
+	return rsltErr
+}
+
 // checks an account field for any numbers and returns a slice of errors
 func fieldHasNumbers(val, fieldname string) error {
 	errHasNums := errors.New("field can't contain any numbers")
@@ -122,6 +131,9 @@ func VetAllFields(acct Account) []error {
 	tmpErrs = append(tmpErrs, fieldIsEmpty(acct.Address, "address"))
 	tmpErrs = append(tmpErrs, fieldIsEmpty(acct.Email, "email"))
 	tmpErrs = append(tmpErrs, fieldIsEmpty(string(acct.Password), "password"))
+
+	tmpErrs = append(tmpErrs, fieldHasPunct(acct.Fname, "fname"))
+	tmpErrs = append(tmpErrs, fieldHasPunct(acct.Lname, "lname"))
 
 	tmpErrs = append(tmpErrs, fieldHasNumbers(acct.Fname, "fname"))
 	tmpErrs = append(tmpErrs, fieldHasNumbers(acct.Lname, "lname"))
