@@ -1,60 +1,56 @@
 ## welcome to drumstick
-drumstick is a  locally ran small twitter clone.
-The goal of this project is to be able to render a user's 
-timeline.
+
+- drumstick is a  locally ran small twitter clone.
+  The goal of this project is to be able to render a user's 
+  timeline.
 
 ## Prior to Running
 
 ### Programs to be installed
 
-This program requires the go programming language
-PostgreSQL and a terminal to be installed on your local machine.
-Postman is also required to test routes and authentication.
+- This program requires the go programming language
+  PostgreSQL and a terminal to be installed on your local machine.
+  Postman is also required to test routes and authentication.
+  This program is meant to run on MacOS and Windows.
 
-### Installing the Dependencies
+### Setup
 
+- included in the project is a makefile which will setup the project for you.
+  
 #### MacOS
-- On Macos: The easiest way to install the above programs is via homebrew pkg manager.
-  Open up the terminal and type the cmd `brew install go postgresql`.
-  
-#### Windows
-- On Windows: The easiest way to install the programs is to use the  chocolatey pkg manager.
-  Open the terminal and type `choco install go postgresql`. 
-  
-#### Postman
-Postman can be downloaded from the website.
 
-### Setting Up Postgresql
+- Simply run `make macos-setup`and  it will install the hombrew pkg manager. 
+  Then, it will install go, and postgresql using homebrew. After Postgresql is installed,
+  it'll create the database drumstick and import the sql dump file included in the project.
+
+
+#### Windows
+- wip
+
+#### Postman
+- Postman can be downloaded from the website.
+
+### Starting Postgresql
 
 #### Macos
 - Open the terminal and start the postgresql server with `brew services start postgresql`
-
-- Included in the project is a sql dump file thats meant to be used to import the database.
-  To import the database using the following command. 
-  Note: make sure to replace the angular brackets in username with your actual database username.
-  `createdb drumstick`.
-  `psql --username=<user_name> drumstick < drumstick.sql'`.
- 
+  Then write `psql drumstick` to view the database.
+  
 #### Windows
 
 - Open the services.msc application, look for postgreSQL and make sure its on. 
-  if its not, select to turn it on. Afterwards, in cmd.exe write psql
-
-- Included in the project is a sql dump file thats meant to be used to import the database.
-  To import the database using the following command. 
-  Note: make sure to replace the angular brackets in username with your actual database username.
-  `createdb drumstick`.
-  `psql --username=<user_name> drumstick < drumstick.sql'`.
-
+  if its not, select to turn it on. Afterwards, in cmd.exe write `psql drumstick`
+  to view the database.
+  
 ### Running the application
 
-After you finsh setting up the database, just write `go run .`
-within the directory of the main.go file in the terminal
+- After you finsh setting up the database, just write `go run .`
+  within the directory of the main.go file in the terminal.
 
 ### Visiting the routes
 
-To visits the routes provide Postman with the right request method 
-and address given below. Postman provides a option to render html.
+- To visits the routes provide Postman with the right request method 
+  and address given below. Postman provides a option to render html.
 
 
 ## Routes
