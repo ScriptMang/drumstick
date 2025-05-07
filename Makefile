@@ -14,3 +14,6 @@ install-dependencies:
 import-drumstick:
 	createdb drumstick
 	psql --username=user drumstick < drumstick.sql
+
+build:
+	go build -o drumstick main.go
