@@ -1,8 +1,16 @@
 ## welcome to drumstick
 
-- drumstick is a  locally ran small twitter clone.
-  The goal of this project is to be able to render a user's 
-  timeline.
+- drumstick is a locally ran program that allows simulates a post timeline
+
+## Milestones
+
+- [x] Users can signup and create accounts
+- [x] Users can login
+- [x] Jwt auth is implemented
+- [ ] Users can add posts
+- [ ] Users can delete their posts.
+- [ ] Users can edit their posts.
+- [ ] Secure all user post routes with JWT auth.
 
 ## Prior to Running
 
