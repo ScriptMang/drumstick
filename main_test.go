@@ -131,19 +131,20 @@ func Test_accountcreation(t *testing.T) {
 		password                     []byte
 		errLst                       []error
 	}{
-		{"Empty Attributes", []string{"fname", "lname"}, "", "", "409 Alistar Road", "jnp59@gmail.com", []byte("desertStorm432"), []error{errEmptyField, errEmptyField}},
-		{"No Spaces Found in Fname", []string{"fname"}, " Jon", "Martin", "409 Alistar Road", "jnp59@gmail.com", []byte("desertStorm432"), []error{errHasPunct}},
-		{"No Spaces Found in Lname", []string{"lname"}, "Jon", " Martin", "409 Alistar Road", "jnp59@gmail.com", []byte("desertStorm432"), []error{errHasPunct}},
-		{"No Spaces Found in Fname and Lname", []string{"fname", "lname"}, " Jon", " Martin", "409 Alistar Road", "jnp59@gmail.com", []byte("desertStorm432"), []error{errHasPunct, errHasPunct}},
-		{"No Symbols in Fname", []string{"fname"}, "Jon@", "Martin", "409 Alistar Road", "jnp59@gmail.com", []byte("desertStorm432"), []error{errHasSymbols}},
-		{"No Symbols in Lname", []string{"lname"}, "Jon", "@Martin", "409 Alistar Road", "jnp59@gmail.com", []byte("desertStorm432"), []error{errHasSymbols}},
-		{"No Numbers in Fname", []string{"fname"}, "Jon3", "Martin", "409 Alistar Road", "jnp59@gmail.com", []byte("desertStorm432"), []error{errHasNums}},
-		{"No Numbers in Lname", []string{"lname"}, "Jon", "Martin5", "409 Alistar Road", "jnp59@gmail.com", []byte("desertStorm432"), []error{errHasNums}},
-		{"No Symbols in Address", []string{"address"}, "Jon", "Martin", "@409 Alistar Road", "jnp59@gmail.com", []byte("desertStorm432"), []error{errHasSymbols}},
-		{"Missing '@' Symbol in Email", []string{"email"}, "Jon", "Martin", "409 Alistar Road", "jnp59gmail.com", []byte("desertStorm432"), []error{errReqSymbol}},
-		{"Missing digits in Email", []string{"email", "email"}, "Jon", "Martin", "409 Alistar Road", "jnp@gmail.com", []byte("desertStorm432"), []error{errReqNums}},
-		{"Missing digits and Invalid ending address in Email", []string{"email", "email"}, "Jon", "Martin", "409 Alistar Road", "jnp@gmail.dum", []byte("desertStorm432"), []error{errReqNums, errReqEndingAddr}},
-		{"Have at least One Capital Letter in Password", []string{"password"}, "Jon", "Martin", "409 Alistar Road", "jnp59@gmail.com", []byte("desertstorm432"), []error{missingCapitalLetter}},
+
+		{"Empty Attributes", []string{"fname", "lname"}, "", "", "409 Alistar Road", "dummy59@gmail.com", []byte("passwordPop432"), []error{errEmptyField, errEmptyField}},
+		{"No Spaces Found in Fname", []string{"fname"}, " Jon", "Martin", "409 Alistar Road", "dummy59@gmail.com", []byte("passwordPop432"), []error{errHasPunct}},
+		{"No Spaces Found in Lname", []string{"lname"}, "Jon", " Martin", "409 Alistar Road", "dummy59@gmail.com", []byte("passwordPop432"), []error{errHasPunct}},
+		{"No Spaces Found in Fname and Lname", []string{"fname", "lname"}, " Jon", " Martin", "409 Alistar Road", "dummy59@gmail.com", []byte("passwordPop432"), []error{errHasPunct, errHasPunct}},
+		{"No Symbols in Fname", []string{"fname"}, "Jon@", "Martin", "409 Alistar Road", "dummy59@gmail.com", []byte("passwordPop432"), []error{errHasSymbols}},
+		{"No Symbols in Lname", []string{"lname"}, "Jon", "@Martin", "409 Alistar Road", "dummy59@gmail.com", []byte("passwordPop432"), []error{errHasSymbols}},
+		{"No Numbers in Fname", []string{"fname"}, "Jon3", "Martin", "409 Alistar Road", "dummy59@gmail.com", []byte("passwordPop432"), []error{errHasNums}},
+		{"No Numbers in Lname", []string{"lname"}, "Jon", "Martin5", "409 Alistar Road", "dummy59@gmail.com", []byte("passwordPop432"), []error{errHasNums}},
+		{"No Symbols in Address", []string{"address"}, "Jon", "Martin", "@409 Alistar Road", "dummy59@gmail.com", []byte("passwordPop432"), []error{errHasSymbols}},
+		{"Missing '@' Symbol in Email", []string{"email"}, "Jon", "Martin", "409 Alistar Road", "dummy59gmail.com", []byte("passwordPop432"), []error{errReqSymbol}},
+		{"Missing digits in Email", []string{"email", "email"}, "Jon", "Martin", "409 Alistar Road", "dummy@gmail.com", []byte("passwordPop432"), []error{errReqNums}},
+		{"Missing digits and Invalid ending address in Email", []string{"email", "email"}, "Jon", "Martin", "409 Alistar Road", "dummy@gmail.dum", []byte("passwordPop432"), []error{errReqNums, errReqEndingAddr}},
+		{"Have at least One Capital Letter in Password", []string{"password"}, "Jon", "Martin", "409 Alistar Road", "dummy59@gmail.com", []byte("passwordPop432"), []error{missingCapitalLetter}},
 	}
 
 	// range over table tests and validate the right errs are being thrown
