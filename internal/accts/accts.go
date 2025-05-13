@@ -122,6 +122,49 @@ func vetEmailAddress(email string) []error {
 	return tmpErrs
 }
 
+// verifies if the user's password meet standards for account creation
+// if it doesn't a slice of errors are returned
+func vetPassword(password string) []error {
+	emptyPswd := errors.New("password can't be empty")
+	pswdTooShort := errors.New("password is too short")
+	pswdTooLong := errors.New("password is too long")
+	pswdHasNoCapLetters := errors.New("password is missing a capital letter")
+	pswdHasNoDigits := errors.New("password is missing digits")
+	pswdHasSymbols := errors.New("password can't contain any symbols")
+
+	var rsltErr []error
+	switch {
+	case len(password) == 0:
+		rsltErr = append(rsltErr, emptyPswd)
+	case len(password) < 15:
+		rsltErr = append(rsltErr, pswdTooShort)
+	case len(password) > 15:
+		rsltErr = append(rsltErr, pswdTooLong)
+	}
+
+	// check for symbols in the pswd
+	symbolsFilter := "!@$_^%&*();/-+=\"'`~[]{}<|>"
+	if bytes.ContainsAny([]byte(password), symbolsFilter) {
+		rsltErr = append(rsltErr, pswdHasSymbols)
+	}
+
+	// check for capital Letter in pswd
+	capLetters := "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	pswdHasCaps := strings.ContainsAny(password, capLetters)
+	if !pswdHasCaps {
+		rsltErr = append(rsltErr, pswdHasNoCapLetters)
+	}
+
+	// check for number in pswd
+	nums := "012345689"
+	pswdHasNums := strings.ContainsAny(password, nums)
+	if !pswdHasNums {
+		rsltErr = append(rsltErr, pswdHasNoDigits)
+	}
+
+	return rsltErr
+}
+
 func VetAllFields(acct Account) []error {
 	var tmpErrs []error
 	var rsltErr []error
@@ -142,12 +185,13 @@ func VetAllFields(acct Account) []error {
 	tmpErrs = append(tmpErrs, fieldHasSymbols(acct.Lname, "lname"))
 	tmpErrs = append(tmpErrs, fieldHasSymbols(acct.Address, "address"))
 	tmpErrs = append(tmpErrs, vetEmailAddress(acct.Email)...)
+	tmpErrs = append(tmpErrs, vetPassword(string(acct.Password))...)
 
-	symbolsFilter := "!@$_^%&*();/-+=\"'`~[]{}<|>"
-	errHasSymbols := errors.New("field can't contain any symbols")
-	if bytes.ContainsAny(acct.Password, symbolsFilter) {
-		tmpErrs = append(tmpErrs, fmt.Errorf("error:password:%w", errHasSymbols))
-	}
+	// symbolsFilter := "!@$_^%&*();/-+=\"'`~[]{}<|>"
+	// errHasSymbols := errors.New("field can't contain any symbols")
+	// if bytes.ContainsAny(acct.Password, symbolsFilter) {
+	// 	tmpErrs = append(tmpErrs, fmt.Errorf("error:password:%w", errHasSymbols))
+	// }
 
 	for _, err := range tmpErrs {
 		if err != nil {
@@ -155,7 +199,7 @@ func VetAllFields(acct Account) []error {
 		}
 	}
 
-	return rsltErr
+	return tmpErrs
 }
 
 // check user credentials for empty fields
