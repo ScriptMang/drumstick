@@ -125,12 +125,12 @@ func vetEmailAddress(email string) []error {
 // verifies if the user's password meet standards for account creation
 // if it doesn't a slice of errors are returned
 func vetPassword(password string) []error {
-	emptyPswd := errors.New("password can't be empty")
-	pswdTooShort := errors.New("password is too short")
-	pswdTooLong := errors.New("password is too long")
-	pswdHasNoCapLetters := errors.New("password is missing a capital letter")
-	pswdHasNoDigits := errors.New("password is missing digits")
-	pswdHasSymbols := errors.New("password can't contain any symbols")
+	emptyPswd := errors.New("field can't be empty")
+	pswdTooShort := errors.New("field too short")
+	pswdTooLong := errors.New("field too long")
+	pswdHasNoCapLetters := errors.New("field is missing at least 1 capital letter")
+	pswdHasNoDigits := errors.New("field missing at least 1 digit")
+	pswdHasSymbols := errors.New("field can't contain any symbols")
 
 	var rsltErr []error
 	switch {
