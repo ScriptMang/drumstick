@@ -186,12 +186,6 @@ func VetAllFields(acct Account) []error {
 	tmpErrs = append(tmpErrs, vetEmailAddress(acct.Email)...)
 	tmpErrs = append(tmpErrs, vetPassword(string(acct.Password))...)
 
-	// symbolsFilter := "!@$_^%&*();/-+=\"'`~[]{}<|>"
-	// errHasSymbols := errors.New("field can't contain any symbols")
-	// if bytes.ContainsAny(acct.Password, symbolsFilter) {
-	// 	tmpErrs = append(tmpErrs, fmt.Errorf("error:password:%w", errHasSymbols))
-	// }
-
 	for _, err := range tmpErrs {
 		if err != nil {
 			rsltErr = append(rsltErr, err)
