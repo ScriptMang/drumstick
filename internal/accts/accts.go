@@ -135,31 +135,31 @@ func vetPassword(password string) []error {
 	var rsltErr []error
 	switch {
 	case len(password) == 0:
-		rsltErr = append(rsltErr, fmt.Errorf("error:password: %w", emptyPswd))
+		rsltErr = append(rsltErr, fmt.Errorf("error:password:%w", emptyPswd))
 	case len(password) < 15:
-		rsltErr = append(rsltErr, fmt.Errorf("error:password: %w", pswdTooShort))
+		rsltErr = append(rsltErr, fmt.Errorf("error:password:%w", pswdTooShort))
 	case len(password) > 15:
-		rsltErr = append(rsltErr, fmt.Errorf("error:password: %w", pswdTooLong))
+		rsltErr = append(rsltErr, fmt.Errorf("error:password:%w", pswdTooLong))
 	}
 
 	// check for symbols in the pswd
 	symbolsFilter := "!@$_^%&*();/-+=\"'`~[]{}<|>"
 	if bytes.ContainsAny([]byte(password), symbolsFilter) {
-		rsltErr = append(rsltErr, fmt.Errorf("error:password: %w", pswdHasSymbols))
+		rsltErr = append(rsltErr, fmt.Errorf("error:password:%w", pswdHasSymbols))
 	}
 
 	// check for capital Letter in pswd
 	capLetters := "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 	pswdHasCaps := strings.ContainsAny(password, capLetters)
 	if !pswdHasCaps {
-		rsltErr = append(rsltErr, fmt.Errorf("error:password: %w", pswdHasNoCapLetters))
+		rsltErr = append(rsltErr, fmt.Errorf("error:password:%w", pswdHasNoCapLetters))
 	}
 
 	// check for number in pswd
 	nums := "012345689"
 	pswdHasNums := strings.ContainsAny(password, nums)
 	if !pswdHasNums {
-		rsltErr = append(rsltErr, fmt.Errorf("error:password: %w", pswdHasNoDigits))
+		rsltErr = append(rsltErr, fmt.Errorf("error:password:%w", pswdHasNoDigits))
 	}
 
 	return rsltErr

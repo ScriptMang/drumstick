@@ -122,7 +122,7 @@ func Test_accountcreation(t *testing.T) {
 	errReqEndingAddr := errors.New("email doesn't match any of the ending addresses.")
 
 	// password errs
-	missingCapitalLetter := errors.New("password is missing a capital letter")
+	missingCapitalLetter := errors.New("field is missing at least 1 capital letter")
 
 	tests := []struct {
 		testName                     string
@@ -144,7 +144,7 @@ func Test_accountcreation(t *testing.T) {
 		{"Missing '@' Symbol in Email", []string{"email"}, "Jon", "Martin", "409 Alistar Road", "dummy59gmail.com", []byte("passwordPomp432"), []error{errReqSymbol}},
 		{"Missing digits in Email", []string{"email", "email"}, "Jon", "Martin", "409 Alistar Road", "dummy@gmail.com", []byte("passwordPomp432"), []error{errReqNums}},
 		{"Missing digits and Invalid ending address in Email", []string{"email", "email"}, "Jon", "Martin", "409 Alistar Road", "dummy@gmail.dum", []byte("passwordPomp432"), []error{errReqNums, errReqEndingAddr}},
-		{"Have at least One Capital Letter in Password", []string{"password"}, "Jon", "Martin", "409 Alistar Road", "dummy59@gmail.com", []byte("passwordPomp432"), []error{missingCapitalLetter}},
+		{"Missing at least One Capital Letter in Password", []string{"password"}, "Jon", "Martin", "409 Alistar Road", "dummy59@gmail.com", []byte("passwordpomp432"), []error{missingCapitalLetter}},
 	}
 
 	// range over table tests and validate the right errs are being thrown
