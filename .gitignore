@@ -12,7 +12,7 @@ drumstick
 *.test
 
 # Output of go code coverage tool
-*.output
+*.out
 
 # Project files and folders
 /internal/accts/accts.go~
