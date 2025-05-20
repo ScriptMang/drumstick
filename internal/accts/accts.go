@@ -296,10 +296,10 @@ func CompareUserCreds(email string, pswd string) error {
 		}
 	}
 
+	invalidUserCreds := errors.New("incorrect email or password.")
 	if !emailIsReal {
-		errEmailNotFound := errors.New("error: email does not exist")
-		log.Println(errEmailNotFound)
-		return errEmailNotFound
+		log.Println(invalidUserCreds)
+		return invalidUserCreds
 	}
 
 	// need pswd hash from database
@@ -307,12 +307,6 @@ func CompareUserCreds(email string, pswd string) error {
 
 	ctx, db := backend.Connect()
 	defer db.Close()
-
-	if len(pswd) < 15 {
-		errPswdTooShort := errors.New("error: password is too short, password should be at minimum 15 or more")
-		log.Println(errPswdTooShort)
-		return errPswdTooShort
-	}
 
 	var users []*UserAccount
 	err := pgxscan.Select(ctx, db, &users, `Select * FROM user_account`)
@@ -324,9 +318,8 @@ func CompareUserCreds(email string, pswd string) error {
 	}
 
 	if len(users) == 0 {
-		errNoRowFound := errors.New("query error: user accounts are empty")
-		log.Println(errNoRowFound)
-		return errNoRowFound
+		log.Println(invalidUserCreds)
+		return invalidUserCreds
 	}
 
 	hashIsReal := false
@@ -338,9 +331,8 @@ func CompareUserCreds(email string, pswd string) error {
 	}
 
 	if !hashIsReal {
-		errMismatchedHash := errors.New("password mismatch error: hash does not match password")
-		log.Println(errMismatchedHash)
-		return errMismatchedHash
+		log.Println(invalidUserCreds)
+		return invalidUserCreds
 	}
 
 	return nil
