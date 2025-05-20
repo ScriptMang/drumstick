@@ -166,7 +166,7 @@ func Test_accountcreation(t *testing.T) {
 func Test_userlogin(t *testing.T) {
 	r := setupEchoClient()
 
-	invalidUserCreds := errors.New("Failed Authentication")
+	invalidUserCreds := errors.New("incorrect email or password.")
 	tests := []struct {
 		testName string
 		username string
