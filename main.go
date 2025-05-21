@@ -3,7 +3,6 @@ package main
 import (
 	"errors"
 	"html/template"
-	"io"
 	"log"
 	"net/http"
 	"os"
@@ -11,29 +10,13 @@ import (
 	"scriptmang/drumstick/internal/accts"
 	"scriptmang/drumstick/internal/posts"
 	"scriptmang/drumstick/internal/sessionmanager"
+	"scriptmang/drumstick/internal/templateRenderer"
 
 	"github.com/golang-jwt/jwt/v5"
 	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
-
-type TemplateManager struct {
-	templates *template.Template
-}
-
-func (tm *TemplateManager) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
-	if viewContext, isMap := data.(map[string]interface{}); isMap {
-		viewContext["reverse"] = c.Echo().Reverse
-	}
-	err := tm.templates.ExecuteTemplate(w, name, data)
-
-	if err != nil {
-		log.Println("template not found")
-	}
-
-	return err
-}
 
 func signUp(c echo.Context) error {
 	data := "Register a New User"
@@ -167,8 +150,8 @@ func addPosts(c echo.Context) error {
 }
 
 func main() {
-	tm := &TemplateManager{
-		templates: template.Must(template.ParseGlob("ui/html/pages/*[^#?!|].tmpl")),
+	tm := &templateRenderer.TemplateManager{
+		Templates: template.Must(template.ParseGlob("ui/html/pages/*[^#?!|].tmpl")),
 	}
 
 	router := echo.New()
