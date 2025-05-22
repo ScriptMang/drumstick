@@ -94,3 +94,32 @@ func Test_accountcreation(t *testing.T) {
 		})
 	}
 }
+
+func Test_userlogin(t *testing.T) {
+	r := setupEchoClient()
+
+	invalidUserCreds := errors.New("incorrect email or password.")
+	tests := []struct {
+		testName string
+		username string
+		password string
+	}{
+		{"Empty values", "", ""},
+		{"bad password", "dummy2", "dummy54Dwdgfdgf"},
+		{"bad username", "dummy2", "mldKMuffinDrop4"},
+		{"password is too long", "dummy2", "lkdrWkkkkkkkkk"},
+		{"password is too short", "dummy2", "dfdf"},
+	}
+
+	for _, tt := range tests {
+		req, _ := http.NewRequest("POST", "/posts", nil)
+		w := httptest.NewRecorder()
+		c := r.NewContext(req, w)
+		c.SetPath("/posts")
+		t.Run(tt.testName, func(t *testing.T) {
+			actualErr := CompareUserCreds(tt.username, tt.password)
+			assert.Equal(t, invalidUserCreds, actualErr, invalidUserCreds)
+		})
+	}
+
+}
