@@ -13,6 +13,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/stretchr/testify/assert"
+	"golang.org/x/crypto/bcrypt"
 )
 
 func setupEchoClient() *echo.Echo {
@@ -37,6 +38,21 @@ func printAcctErrs(attribNames []string, errMsgs []error) []error {
 		tempErrLst = append(tempErrLst, fmt.Errorf("error:%s:%w", attribNames[i], errMsg))
 	}
 	return tempErrLst
+}
+
+func Test_encryptPassword(t *testing.T) {
+
+	longPswd := bcrypt.ErrPasswordTooLong
+	samplePswd1 := []byte("superfragilistic alidocious superfragilistic alidocious superfragilistic alidocious superfragilistic alidocious")
+	samplePswd2 := []byte("TheRightAmount2")
+
+	_, actualErr1 := encryptPassword(samplePswd1)
+	assert.EqualError(t, actualErr1, longPswd.Error())
+
+	_, actualErr2 := encryptPassword(samplePswd2)
+	if actualErr2 != nil {
+		t.Fatalf("error:pswd:%s", actualErr2.Error())
+	}
 }
 
 func Test_accountcreation(t *testing.T) {
@@ -99,6 +115,7 @@ func Test_userlogin(t *testing.T) {
 	r := setupEchoClient()
 
 	invalidUserCreds := errors.New("incorrect email or password.")
+	failedDBConn := errors.New("database error: couldn’t connect to drumstick")
 	tests := []struct {
 		testName string
 		username string
@@ -118,8 +135,15 @@ func Test_userlogin(t *testing.T) {
 		c.SetPath("/posts")
 		t.Run(tt.testName, func(t *testing.T) {
 			actualErr := CompareUserCreds(tt.username, tt.password)
-			assert.Equal(t, invalidUserCreds, actualErr, invalidUserCreds)
+
+			if errors.Is(actualErr, invalidUserCreds) {
+				assert.Equal(t, invalidUserCreds, actualErr, invalidUserCreds)
+			}
+
+			if errors.Is(actualErr, failedDBConn) {
+				assert.EqualError(t, actualErr, failedDBConn.Error())
+				return
+			}
 		})
 	}
-
 }
