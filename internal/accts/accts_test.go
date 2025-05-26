@@ -10,6 +10,7 @@ import (
 
 	"scriptmang/drumstick/internal/templateRenderer"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/stretchr/testify/assert"
@@ -145,5 +146,19 @@ func Test_userlogin(t *testing.T) {
 				return
 			}
 		})
+	}
+}
+
+// test userid retrieval by email
+func Test_UserIDByEmail(t *testing.T) {
+	sample := "dummy@gmail.com"
+	actual, actualErr := UserIDByEmail(sample)
+
+	if errors.Is(actualErr, pgx.ErrNoRows) {
+		assert.EqualError(t, actualErr, pgx.ErrNoRows.Error())
+	} else if actualErr != nil {
+		t.Fatalf("error:userid by email: %s", actualErr)
+	} else if actualErr == nil {
+		assert.Equal(t, 1, actual)
 	}
 }
