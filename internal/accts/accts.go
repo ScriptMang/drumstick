@@ -195,69 +195,6 @@ func VetAllFields(acct Account) []error {
 	return rsltErr
 }
 
-// check user credentials for empty fields
-// and append the errors to the err slice
-func VetUserCreds(email, password string) []error {
-	emptyEmail := errors.New("email can't be empty")
-	emptyPswd := errors.New("password can't be empty")
-	emailTooShort := errors.New("email is too short")
-	emailTooLong := errors.New("email is too long")
-	pswdTooShort := errors.New("password is too short")
-	pswdTooLong := errors.New("password is too long")
-	missingCapitalLetter := errors.New("password is missing a capital letter")
-	missingNumber := errors.New("password is missing a capital letter")
-	punctInEmail := errors.New("no special punctuation in the email")
-	symbolsInEmail := errors.New("no special symbols in the email")
-
-	var rsltErr []error
-	switch {
-	case email == "":
-		rsltErr = append(rsltErr, emptyEmail)
-	case len(email) < 15:
-		rsltErr = append(rsltErr, emailTooShort)
-	case len(email) > 15:
-		rsltErr = append(rsltErr, emailTooLong)
-	}
-
-	// check for punct in email
-	punct := " ?!;:,"
-	emailHasPunct := strings.ContainsAny(email, punct)
-	if emailHasPunct {
-		rsltErr = append(rsltErr, punctInEmail)
-	}
-	// check for symbols in  email
-	symbols := "#$%^&*[]{}()%|\\`~"
-	userHasSymbols := strings.ContainsAny(email, symbols)
-	if userHasSymbols {
-		rsltErr = append(rsltErr, symbolsInEmail)
-	}
-
-	switch {
-	case len(password) == 0:
-		rsltErr = append(rsltErr, emptyPswd)
-	case len(password) < 15:
-		rsltErr = append(rsltErr, pswdTooShort)
-	case len(password) > 15:
-		rsltErr = append(rsltErr, pswdTooLong)
-	}
-
-	// check for capital Letter in pswd
-	capLetters := "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-	pswdHasCaps := strings.ContainsAny(password, capLetters)
-	if !pswdHasCaps {
-		rsltErr = append(rsltErr, missingCapitalLetter)
-	}
-
-	// check for number in pswd
-	nums := "012345689"
-	pswdHasNums := strings.ContainsAny(password, nums)
-	if !pswdHasNums {
-		rsltErr = append(rsltErr, missingNumber)
-	}
-
-	return rsltErr
-}
-
 // returns a slice of all the emails in the database
 func readEmails() []string {
 	ctx, db := backend.Connect()
