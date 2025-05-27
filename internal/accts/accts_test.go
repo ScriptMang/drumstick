@@ -71,6 +71,10 @@ func Test_accountcreation(t *testing.T) {
 	errReqEndingAddr := errors.New("email doesn't match any of the ending addresses.")
 
 	// password errs
+	emptyPswd := errors.New("field can't be empty")
+	shortPswd := errors.New("field can't be short")
+	longPswd := errors.New("field can't be long")
+	pswdHasNoDigits := errors.New("field can't be long")
 	missingCapitalLetter := errors.New("field is missing at least 1 capital letter")
 
 	tests := []struct {
@@ -80,7 +84,6 @@ func Test_accountcreation(t *testing.T) {
 		password                     []byte
 		errLst                       []error
 	}{
-
 		{"Empty Attributes", []string{"fname", "lname"}, "", "", "409 Alistar Road", "dummy59@gmail.com", []byte("passwordPomp432"), []error{errEmptyField, errEmptyField}},
 		{"No Spaces Found in Fname", []string{"fname"}, " Jon", "Martin", "409 Alistar Road", "dummy59@gmail.com", []byte("passwordPomp432"), []error{errHasPunct}},
 		{"No Spaces Found in Lname", []string{"lname"}, "Jon", " Martin", "409 Alistar Road", "dummy59@gmail.com", []byte("passwordPomp432"), []error{errHasPunct}},
@@ -94,6 +97,10 @@ func Test_accountcreation(t *testing.T) {
 		{"Missing digits in Email", []string{"email", "email"}, "Jon", "Martin", "409 Alistar Road", "dummy@gmail.com", []byte("passwordPomp432"), []error{errReqNums}},
 		{"Missing digits and Invalid ending address in Email", []string{"email", "email"}, "Jon", "Martin", "409 Alistar Road", "dummy@gmail.dum", []byte("passwordPomp432"), []error{errReqNums, errReqEndingAddr}},
 		{"Missing at least One Capital Letter in Password", []string{"password"}, "Jon", "Martin", "409 Alistar Road", "dummy59@gmail.com", []byte("passwordpomp432"), []error{missingCapitalLetter}},
+		{"Password is empty", []string{"password"}, "Jon", "Martin", "409 Alistar Road", "dummy59@gmail.com", []byte(""), []error{emptyPswd}},
+		{"Password is too short", []string{"password"}, "Jon", "Martin", "409 Alistar Road", "dummy59@gmail.com", []byte("password"), []error{shortPswd, missingCapitalLetter, pswdHasNoDigits}},
+		{"Password is too long", []string{"password"}, "Jon", "Martin", "409 Alistar Road", "dummy59@gmail.com", []byte("passwordPomp43233"), []error{longPswd}},
+		{"Password has no digits", []string{"password"}, "Jon", "Martin", "409 Alistar Road", "dummy59@gmail.com", []byte("passwordpompp"), []error{longPswd, missingCapitalLetter, pswdHasNoDigits}},
 	}
 
 	// range over table tests and validate the right errs are being thrown
