@@ -151,14 +151,19 @@ func Test_userlogin(t *testing.T) {
 
 // test userid retrieval by email
 func Test_UserIDByEmail(t *testing.T) {
+	rscNotFound := errors.New("error: resource not found: id does not exist")
 	sample := "dummy@gmail.com"
 	actual, actualErr := UserIDByEmail(sample)
 
 	if errors.Is(actualErr, pgx.ErrNoRows) {
 		assert.EqualError(t, actualErr, pgx.ErrNoRows.Error())
-	} else if actualErr != nil {
-		t.Fatalf("error:userid by email: %s", actualErr)
-	} else if actualErr == nil {
+	}
+
+	if errors.Is(actualErr, rscNotFound) {
+		assert.EqualError(t, actualErr, rscNotFound.Error())
+	}
+
+	if actualErr == nil {
 		assert.Equal(t, 1, actual)
 	}
 }
