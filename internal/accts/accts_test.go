@@ -75,6 +75,7 @@ func Test_accountcreation(t *testing.T) {
 	shortPswd := errors.New("field too short")
 	longPswd := errors.New("field too long")
 	pswdHasNoDigits := errors.New("field missing at least 1 digit")
+	pswdHasSymbols := errors.New("field can't contain any symbols")
 	missingCapitalLetter := errors.New("field is missing at least 1 capital letter")
 
 	tests := []struct {
@@ -100,7 +101,7 @@ func Test_accountcreation(t *testing.T) {
 		{"Password is empty", []string{"password"}, "Jon", "Martin", "409 Alistar Road", "dummy59@gmail.com", []byte(""), []error{emptyPswd}},
 		{"Password is too short", []string{"password", "password", "password"}, "Jon", "Martin", "409 Alistar Road", "dummy59@gmail.com", []byte("prompt"), []error{shortPswd, missingCapitalLetter, pswdHasNoDigits}},
 		{"Password is too long", []string{"password"}, "Jon", "Martin", "409 Alistar Road", "dummy59@gmail.com", []byte("passwordPomp43233"), []error{longPswd}},
-		{"Password has no digits", []string{"password", "password", "password"}, "Jon", "Martin", "409 Alistar Road", "dummy59@gmail.com", []byte("passwordpomppppp"), []error{longPswd, missingCapitalLetter, pswdHasNoDigits}},
+		{"Password has no digits", []string{"password", "password", "password"}, "Jon", "Martin", "409 Alistar Road", "dummy59@gmail.com", []byte("passwordpomppppp"), []error{longPswd, missingCapitalLetter, pswdHasNoDigits}}, {"Password has symbols", []string{"password"}, "Jon", "Martin", "409 Alistar Road", "dummy59@gmail.com", []byte("passwordPomp43!"), []error{pswdHasSymbols}},
 	}
 
 	// range over table tests and validate the right errs are being thrown
