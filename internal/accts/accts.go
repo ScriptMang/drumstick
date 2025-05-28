@@ -136,6 +136,7 @@ func vetPassword(password string) []error {
 	switch {
 	case len(password) == 0:
 		rsltErr = append(rsltErr, fmt.Errorf("error:password:%w", emptyPswd))
+		return rsltErr
 	case len(password) < 15:
 		rsltErr = append(rsltErr, fmt.Errorf("error:password:%w", pswdTooShort))
 	case len(password) > 15:
