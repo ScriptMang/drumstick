@@ -98,7 +98,7 @@ func Test_accountcreation(t *testing.T) {
 		{"Missing digits and Invalid ending address in Email", []string{"email", "email"}, "Jon", "Martin", "409 Alistar Road", "dummy@gmail.dum", []byte("passwordPomp432"), []error{errReqNums, errReqEndingAddr}},
 		{"Missing at least One Capital Letter in Password", []string{"password"}, "Jon", "Martin", "409 Alistar Road", "dummy59@gmail.com", []byte("passwordpomp432"), []error{missingCapitalLetter}},
 		{"Password is empty", []string{"password"}, "Jon", "Martin", "409 Alistar Road", "dummy59@gmail.com", []byte(""), []error{emptyPswd}},
-		{"Password is too short", []string{"password"}, "Jon", "Martin", "409 Alistar Road", "dummy59@gmail.com", []byte("password"), []error{shortPswd, missingCapitalLetter, pswdHasNoDigits}},
+		{"Password is too short", []string{"password", "password", "password"}, "Jon", "Martin", "409 Alistar Road", "dummy59@gmail.com", []byte("prompt"), []error{shortPswd, missingCapitalLetter, pswdHasNoDigits}},
 		{"Password is too long", []string{"password"}, "Jon", "Martin", "409 Alistar Road", "dummy59@gmail.com", []byte("passwordPomp43233"), []error{longPswd}},
 		{"Password has no digits", []string{"password"}, "Jon", "Martin", "409 Alistar Road", "dummy59@gmail.com", []byte("passwordpompp"), []error{longPswd, missingCapitalLetter, pswdHasNoDigits}},
 	}
