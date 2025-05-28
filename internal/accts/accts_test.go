@@ -72,9 +72,9 @@ func Test_accountcreation(t *testing.T) {
 
 	// password errs
 	emptyPswd := errors.New("field can't be empty")
-	shortPswd := errors.New("field can't be short")
+	shortPswd := errors.New("field too short")
 	longPswd := errors.New("field can't be long")
-	pswdHasNoDigits := errors.New("field can't be long")
+	pswdHasNoDigits := errors.New("field missing at least 1 digit")
 	missingCapitalLetter := errors.New("field is missing at least 1 capital letter")
 
 	tests := []struct {
