@@ -100,7 +100,7 @@ func Test_accountcreation(t *testing.T) {
 		{"Password is empty", []string{"password"}, "Jon", "Martin", "409 Alistar Road", "dummy59@gmail.com", []byte(""), []error{emptyPswd}},
 		{"Password is too short", []string{"password", "password", "password"}, "Jon", "Martin", "409 Alistar Road", "dummy59@gmail.com", []byte("prompt"), []error{shortPswd, missingCapitalLetter, pswdHasNoDigits}},
 		{"Password is too long", []string{"password"}, "Jon", "Martin", "409 Alistar Road", "dummy59@gmail.com", []byte("passwordPomp43233"), []error{longPswd}},
-		{"Password has no digits", []string{"password"}, "Jon", "Martin", "409 Alistar Road", "dummy59@gmail.com", []byte("passwordpompp"), []error{longPswd, missingCapitalLetter, pswdHasNoDigits}},
+		{"Password has no digits", []string{"password"}, "Jon", "Martin", "409 Alistar Road", "dummy59@gmail.com", []byte("passwordpomppppp"), []error{longPswd, missingCapitalLetter, pswdHasNoDigits}},
 	}
 
 	// range over table tests and validate the right errs are being thrown
