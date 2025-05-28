@@ -135,6 +135,7 @@ func Test_userlogin(t *testing.T) {
 		{"bad username", "dummy2", "mldKMuffinDrop4"},
 		{"password is too long", "dummy2", "lkdrWkkkkkkkkk"},
 		{"password is too short", "dummy2", "dfdf"},
+		{"password is good", "dummy@gmail.com", "superSecretP432"},
 	}
 
 	for _, tt := range tests {
@@ -146,12 +147,16 @@ func Test_userlogin(t *testing.T) {
 			actualErr := CompareUserCreds(tt.username, tt.password)
 
 			if errors.Is(actualErr, invalidUserCreds) {
-				assert.Equal(t, invalidUserCreds, actualErr, invalidUserCreds)
+				assert.EqualError(t, actualErr, invalidUserCreds.Error())
 			}
 
 			if errors.Is(actualErr, failedDBConn) {
 				assert.EqualError(t, actualErr, failedDBConn.Error())
-				return
+			}
+
+			if actualErr == nil {
+				// the case that the usercreds are legit
+				assert.Equal(t, nil, actualErr)
 			}
 		})
 	}
