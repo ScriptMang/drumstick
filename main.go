@@ -83,7 +83,7 @@ func vetLogin(c echo.Context) error {
 	}
 
 	ck := &http.Cookie{
-		Name:     "Token",
+		Name:     "auth",
 		Value:    t,
 		Quoted:   false,
 		Expires:  expTime.Time,
@@ -98,7 +98,7 @@ func vetLogin(c echo.Context) error {
 
 // this funct is only  for testing purpsos
 func restricted(c echo.Context) error {
-	t, err := c.Cookie("Token")
+	t, err := c.Cookie("auth")
 	if err != nil {
 		return c.HTML(http.StatusUnauthorized,
 			"No authorization token",
@@ -176,7 +176,7 @@ func main() {
 			return new(sessionmanager.UserCustomClaims)
 		},
 		SigningKey:  []byte(os.Getenv("HMAC_SECRET")),
-		TokenLookup: "cookie:Token",
+		TokenLookup: "cookie:auth",
 	}
 	r.Use(echojwt.WithConfig(config))
 
