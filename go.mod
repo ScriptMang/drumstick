@@ -1,6 +1,6 @@
 module scriptmang/drumstick
 
-go 1.23.5
+go 1.24.4
 
 require (
 	github.com/georgysavva/scany/v2 v2.1.4
