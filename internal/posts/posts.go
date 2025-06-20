@@ -12,8 +12,8 @@ import (
 type Post struct {
 	ID            int    `json:"id" form:"id"`
 	UserID        int    `json:"user_id" form:"user_id"`
-	Sender        string `json:"sender" form:"sender"`
-	Receiver      string `json:"receiver" form:"receiver"`
+	ReplyID       int    `json:"reply_id"`
+	ThreadID      int    `json:"thread_id"`
 	Content       string `json:"content" form:"content"`
 	NumbComments  int    `json:"number_comments" form:"number_comments"`
 	NumbReposts   int    `json:"number_reposts" form:"number_reposts"`
