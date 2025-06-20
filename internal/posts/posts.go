@@ -10,16 +10,11 @@ import (
 )
 
 type Post struct {
-	ID            int    `json:"id" form:"id"`
-	UserID        int    `json:"user_id" form:"user_id"`
-	ReplyID       int    `json:"reply_id"`
-	ThreadID      int    `json:"thread_id"`
-	Content       string `json:"content" form:"content"`
-	NumbComments  int    `json:"number_comments" form:"number_comments"`
-	NumbReposts   int    `json:"number_reposts" form:"number_reposts"`
-	NumbLikes     int    `json:"number_likes" form:"number_likes"`
-	NumbViews     int    `json:"number_views" form:"number_views"`
-	NumbBookmarks int    `json:"number_bookmarks" form:"number_bookmarks"`
+	ID       int    `json:"id" form:"id"`
+	UserID   int    `json:"user_id" form:"user_id"`
+	ReplyID  int    `json:"reply_id"`
+	ThreadID int    `json:"thread_id"`
+	Content  string `json:"content" form:"content"`
 }
 
 func CreatePosts(userPost, email string) ([]*Post, error) {
