@@ -284,6 +284,7 @@ func addUserAcct(acct *Account) error {
 	var err error
 	acct.Password, err = encryptPassword(acct.Password)
 	if err != nil {
+
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) {
 			fmt.Println(pgErr.Code)
@@ -291,11 +292,13 @@ func addUserAcct(acct *Account) error {
 		}
 
 		if errors.Is(err, bcrypt.ErrPasswordTooLong) {
-			fmt.Println(err)
+			// fmt.Println(err)
+			return err
 		}
 
 		if errors.Is(err, bcrypt.ErrHashTooShort) {
-			fmt.Println(err)
+			// fmt.Println(err)
+			return err
 		}
 
 		return fmt.Errorf("error: %s, code: %s", pgErr.Message, pgErr.Code)
