@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 16.8 (Homebrew)
--- Dumped by pg_dump version 16.8 (Homebrew)
+-- Dumped from database version 16.9 (Homebrew)
+-- Dumped by pg_dump version 16.9 (Homebrew)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -27,12 +27,8 @@ SET default_table_access_method = heap;
 CREATE TABLE public.posts (
     id integer NOT NULL,
     user_id integer NOT NULL,
-    content character varying(140) NOT NULL,
-    number_comments integer NOT NULL,
-    number_reposts integer NOT NULL,
-    number_likes integer NOT NULL,
-    number_views integer NOT NULL,
-    number_bookmarks integer NOT NULL
+    thread_id integer NOT NULL,
+    content character varying(350) NOT NULL
 );
 
 
@@ -171,7 +167,7 @@ ALTER TABLE ONLY public.user_profile ALTER COLUMN id SET DEFAULT nextval('public
 -- Data for Name: posts; Type: TABLE DATA; Schema: public; Owner: <username>
 --
 
-COPY public.posts (id, user_id, content, number_comments, number_reposts, number_likes, number_views, number_bookmarks) FROM stdin;
+COPY public.posts (id, user_id, thread_id, content) FROM stdin;
 \.
 
 
@@ -210,30 +206,22 @@ SELECT pg_catalog.setval('public.posts_id_seq', 1, false);
 -- Name: user_account_id_seq; Type: SEQUENCE SET; Schema: public; Owner: <username>
 --
 
-SELECT pg_catalog.setval('public.user_account_id_seq', 1, true);
+SELECT pg_catalog.setval('public.user_account_id_seq', 1, false);
 
 
 --
 -- Name: user_profile_id_seq; Type: SEQUENCE SET; Schema: public; Owner: <username>
 --
 
-SELECT pg_catalog.setval('public.user_profile_id_seq', 1, true);
+SELECT pg_catalog.setval('public.user_profile_id_seq', 1, false);
 
 
 --
--- Name: posts posts_pkey; Type: CONSTRAINT; Schema: public; Owner: <username>
---
-
-ALTER TABLE ONLY public.posts
-    ADD CONSTRAINT posts_pkey PRIMARY KEY (id);
-
-
---
--- Name: posts posts_user_id_key; Type: CONSTRAINT; Schema: public; Owner: <username>
+-- Name: posts posts_thread_id_key; Type: CONSTRAINT; Schema: public; Owner: <username>
 --
 
 ALTER TABLE ONLY public.posts
-    ADD CONSTRAINT posts_user_id_key UNIQUE (user_id);
+    ADD CONSTRAINT posts_thread_id_key UNIQUE (thread_id);
 
 
 --
@@ -300,11 +288,11 @@ CREATE INDEX sessions_expiry_idx ON public.sessions USING btree (expiry);
 
 
 --
--- Name: posts posts_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: <username>
+-- Name: posts fk_user_account; Type: FK CONSTRAINT; Schema: public; Owner: <username>
 --
 
 ALTER TABLE ONLY public.posts
-    ADD CONSTRAINT posts_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.user_account(id) ON UPDATE CASCADE ON DELETE CASCADE;
+    ADD CONSTRAINT fk_user_account FOREIGN KEY (user_id) REFERENCES public.user_account(id);
 
 
 --
