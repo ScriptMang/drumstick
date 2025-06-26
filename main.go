@@ -130,7 +130,13 @@ func restricted(c echo.Context) error {
 
 func addPosts(c echo.Context) error {
 	myPost := c.FormValue("content")
-	claims, retrievalErr := sessionmanager.GetUserCustomClaims("", []byte(os.Getenv("HMAC_SECRET")))
+
+	token, cookieErr := c.Cookie("auth")
+	if cookieErr != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, cookieErr)
+	}
+
+	claims, retrievalErr := sessionmanager.GetUserCustomClaims(token.Value, []byte(os.Getenv("HMAC_SECRET")))
 
 	if retrievalErr != nil {
 		return retrievalErr
