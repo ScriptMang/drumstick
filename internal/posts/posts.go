@@ -33,10 +33,8 @@ func CreatePosts(userPost, email string) ([]*Post, error) {
 
 	// add posts to posts
 	var tempPost []*Post
-	err := db.QueryRow(ctx, `INSERT ONTO posts(
-            user_id, reply_id,
-            thread_id, content,
-    ) VALUES($1,$2,$3,$4,$5,$6,$7)`, uid, userPost, 0, 0, 0, 0, 0).Scan(&tempPost)
+	err := db.QueryRow(ctx, `INSERT INTO posts(user_id, reply_id, thread_id, content)`+
+		` VALUES($1,$2,$3,$4)`, uid, 0, 0, userPost).Scan(&tempPost)
 
 	// check list all the errs
 	if err != nil {
