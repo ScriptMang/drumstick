@@ -27,7 +27,7 @@ SET default_table_access_method = heap;
 CREATE TABLE public.posts (
     id integer NOT NULL,
     user_id integer NOT NULL,
-    reply_id integer NOT NULL,
+    parent_id integer NOT NULL,
     thread_id integer NOT NULL,
     content character varying(350) NOT NULL
 );
@@ -168,7 +168,7 @@ ALTER TABLE ONLY public.user_profile ALTER COLUMN id SET DEFAULT nextval('public
 -- Data for Name: posts; Type: TABLE DATA; Schema: public; Owner: <username>
 --
 
-COPY public.posts (id, user_id, reply_id, thread_id, content) FROM stdin;
+COPY public.posts (id, user_id, parent_id, thread_id, content) FROM stdin;
 \.
 
 
@@ -222,7 +222,7 @@ SELECT pg_catalog.setval('public.user_profile_id_seq', 1, false);
 --
 
 ALTER TABLE ONLY public.posts
-    ADD CONSTRAINT fk_unique_posts UNIQUE (id, user_id, reply_id, thread_id, content);
+    ADD CONSTRAINT fk_unique_posts UNIQUE (id, user_id, parent_id, thread_id, content);
 
 
 --

@@ -12,7 +12,7 @@ import (
 type Post struct {
 	ID       int    `json:"id" form:"id"`
 	UserID   int    `json:"user_id" form:"user_id"`
-	ReplyID  int    `json:"reply_id"`
+	ParentID int    `json:"parent_id"`
 	ThreadID int    `json:"thread_id"`
 	Content  string `json:"content" form:"content"`
 }
@@ -33,7 +33,7 @@ func CreatePosts(userPost, email string) ([]*Post, error) {
 
 	// add posts to posts
 	var tempPost []*Post
-	err := db.QueryRow(ctx, `INSERT INTO posts(user_id, reply_id, thread_id, content)`+
+	err := db.QueryRow(ctx, `INSERT INTO posts(user_id, parent_id, thread_id, content)`+
 		` VALUES($1,$2,$3,$4)`, uid, 0, 0, userPost).Scan(&tempPost)
 
 	// check list all the errs
