@@ -17,7 +17,7 @@ type Post struct {
 	Content  string `json:"content" form:"content"`
 }
 
-func CreatePosts(userPost, email string) ([]*Post, error) {
+func CreatePosts(userPost, email string) (*Post, error) {
 	ctx, db := backend.Connect()
 	defer db.Close()
 
@@ -32,9 +32,12 @@ func CreatePosts(userPost, email string) ([]*Post, error) {
 	}
 
 	// add posts to posts
-	var tempPost []*Post
+	var tempPost = new(Post)
 	err := db.QueryRow(ctx, `INSERT INTO posts(user_id, parent_id, thread_id, content)`+
-		` VALUES($1,$2,$3,$4)`, uid, 0, 0, userPost).Scan(&tempPost)
+		` VALUES($1,$2,$3,$4) RETURNING *`, uid, 0, 0, userPost).Scan(
+		&tempPost.ID, &tempPost.UserID, &tempPost.ParentID,
+		&tempPost.ThreadID, &tempPost.Content,
+	)
 
 	// check list all the errs
 	if err != nil {

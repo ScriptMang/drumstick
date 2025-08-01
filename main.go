@@ -180,7 +180,7 @@ func addPosts(c echo.Context) error {
 	// pass list of the user posts
 	// to their posts page
 
-	return c.Render(http.StatusOK, "refresh", *newPost[0])
+	return c.Render(http.StatusOK, "refresh", newPost.Content)
 }
 
 func main() {
