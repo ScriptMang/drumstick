@@ -44,6 +44,34 @@ func accountCreation(c echo.Context) error {
 		return err
 	}
 
+	//  acct is created -> create a token
+	tk, err := sessionmanager.CreateToken(newAcct.Email, c)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err)
+	}
+
+	t, err := tk.SignedString([]byte(os.Getenv("HMAC_SECRET")))
+	if err != nil {
+		return err
+	}
+
+	expTime, expTimeErr := tk.Claims.GetExpirationTime()
+	if expTimeErr != nil {
+		return errors.New("error: failed to get expiration time")
+	}
+
+	ck := &http.Cookie{
+		Name:     "auth",
+		Value:    t,
+		Quoted:   false,
+		Expires:  expTime.Time,
+		HttpOnly: true,
+		SameSite: http.SameSiteLaxMode,
+	}
+
+	c.SetCookie(ck)
+	c.Request().AddCookie(ck)
+
 	// fmt.Println(resp)
 	return c.Render(http.StatusOK, "posts", "Add Posts to Your Feed")
 }
