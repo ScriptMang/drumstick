@@ -25,7 +25,6 @@ SET default_table_access_method = heap;
 --
 
 CREATE TABLE public.posts (
-    id integer NOT NULL,
     user_id integer NOT NULL,
     parent_id integer NOT NULL,
     thread_id integer NOT NULL,
@@ -34,28 +33,6 @@ CREATE TABLE public.posts (
 
 
 ALTER TABLE public.posts OWNER TO <username>;
-
---
--- Name: posts_id_seq; Type: SEQUENCE; Schema: public; Owner: <username>
---
-
-CREATE SEQUENCE public.posts_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER SEQUENCE public.posts_id_seq OWNER TO <username>;
-
---
--- Name: posts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: <username>
---
-
-ALTER SEQUENCE public.posts_id_seq OWNED BY public.posts.id;
-
 
 --
 -- Name: sessions; Type: TABLE; Schema: public; Owner: <username>
@@ -144,13 +121,6 @@ ALTER SEQUENCE public.user_profile_id_seq OWNED BY public.user_profile.id;
 
 
 --
--- Name: posts id; Type: DEFAULT; Schema: public; Owner: <username>
---
-
-ALTER TABLE ONLY public.posts ALTER COLUMN id SET DEFAULT nextval('public.posts_id_seq'::regclass);
-
-
---
 -- Name: user_account id; Type: DEFAULT; Schema: public; Owner: <username>
 --
 
@@ -168,7 +138,7 @@ ALTER TABLE ONLY public.user_profile ALTER COLUMN id SET DEFAULT nextval('public
 -- Data for Name: posts; Type: TABLE DATA; Schema: public; Owner: <username>
 --
 
-COPY public.posts (id, user_id, parent_id, thread_id, content) FROM stdin;
+COPY public.posts (user_id, parent_id, thread_id, content) FROM stdin;
 \.
 
 
@@ -197,13 +167,6 @@ COPY public.user_profile (id, user_id, fname, lname, address) FROM stdin;
 
 
 --
--- Name: posts_id_seq; Type: SEQUENCE SET; Schema: public; Owner: <username>
---
-
-SELECT pg_catalog.setval('public.posts_id_seq', 1, false);
-
-
---
 -- Name: user_account_id_seq; Type: SEQUENCE SET; Schema: public; Owner: <username>
 --
 
@@ -215,14 +178,6 @@ SELECT pg_catalog.setval('public.user_account_id_seq', 1, false);
 --
 
 SELECT pg_catalog.setval('public.user_profile_id_seq', 1, false);
-
-
---
--- Name: posts fk_unique_posts; Type: CONSTRAINT; Schema: public; Owner: <username>
---
-
-ALTER TABLE ONLY public.posts
-    ADD CONSTRAINT fk_unique_posts UNIQUE (id, user_id, parent_id, thread_id, content);
 
 
 --
