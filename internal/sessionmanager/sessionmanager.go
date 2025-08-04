@@ -1,22 +1,13 @@
 package sessionmanager
 
 import (
-	"errors"
 	"fmt"
-	"log"
 	"net/http"
-	"scriptmang/drumstick/internal/backend"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/labstack/echo/v4"
 )
-
-type Session struct {
-	Token  string
-	Data   string
-	Expiry time.Time
-}
 
 type UserCustomClaims struct {
 	Email      string `json:"email"`
@@ -79,45 +70,4 @@ func CreateToken(usr string, c echo.Context) (*jwt.Token, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
 	return token, nil
-}
-
-// adds user token to sessions table in database
-func AddToken(t string, secretKey []byte, c echo.Context) error {
-	_, db := backend.Connect()
-	defer db.Close()
-
-	// Generate encoded token and send it as response.
-
-	claims, err := GetUserCustomClaims(t, secretKey)
-	if err != nil {
-		return err
-	}
-
-	email, err := GetEmail(c)
-	if err != nil {
-		return err
-	}
-	log.Printf("The value of the custom email claim is %s\n", email)
-
-	expTime, err := claims.GetExpirationTime()
-
-	// err retrieving expiration time
-	if err != nil {
-		return errors.New("error: failed to get expiration time")
-	}
-	log.Printf("The value of the registered expr claim is %v\n", expTime)
-	return nil
-
-	// insert token
-	// _, err = db.Exec(
-	// 	ctx,
-	// 	`INSERT INTO sessions (token, data, expiry) VALUES($1, $2, $3)`,
-	// 	t, email, expTime.Time,
-	// )
-
-	// handle multiple errs when insertion goes wrong
-	if err != nil {
-		return fmt.Errorf("error: failed to add usersession: %w", err)
-	}
-	return nil
 }
