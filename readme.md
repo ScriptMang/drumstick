@@ -1,13 +1,14 @@
-## welcome to drumstick
+## Drumstick
 
-- drumstick is a locally ran program that allows simulates a post timeline
+- drumstick is a locally ran program that allows you to create a timeline
 
 ## Milestones
 
 - [x] Users can signup and create accounts
 - [x] Users can login
 - [x] Jwt auth is implemented
-- [ ] Users can add posts
+- [ ] Users can create posts
+- [ ] Users can reply to posts
 - [ ] Users can delete their posts.
 - [ ] Users can edit their posts.
 - [ ] Secure all user post routes with JWT auth.
