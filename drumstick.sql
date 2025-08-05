@@ -16,6 +16,20 @@ SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
 
+--
+-- Name: posts_thread_id_seq; Type: SEQUENCE; Schema: public; Owner: <username>
+--
+
+CREATE SEQUENCE public.posts_thread_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.posts_thread_id_seq OWNER TO <username>;
+
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
@@ -27,7 +41,7 @@ SET default_table_access_method = heap;
 CREATE TABLE public.posts (
     user_id integer NOT NULL,
     parent_id integer NOT NULL,
-    thread_id integer NOT NULL,
+    thread_id integer DEFAULT nextval('public.posts_thread_id_seq'::regclass) NOT NULL,
     content character varying(350) NOT NULL
 );
 
@@ -143,6 +157,13 @@ COPY public.user_account (id, email, password, followers) FROM stdin;
 
 COPY public.user_profile (id, user_id, fname, lname, address) FROM stdin;
 \.
+
+
+--
+-- Name: posts_thread_id_seq; Type: SEQUENCE SET; Schema: public; Owner: <username>
+--
+
+SELECT pg_catalog.setval('public.posts_thread_id_seq', 1, false);
 
 
 --
