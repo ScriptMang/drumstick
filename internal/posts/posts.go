@@ -6,6 +6,7 @@ import (
 	"scriptmang/drumstick/internal/accts"
 	"scriptmang/drumstick/internal/backend"
 
+	"github.com/georgysavva/scany/v2/pgxscan"
 	"github.com/jackc/pgx/v5"
 )
 
@@ -14,6 +15,18 @@ type Post struct {
 	ParentID int    `json:"parent_id"`
 	ThreadID int    `json:"thread_id"`
 	Content  string `json:"content" form:"content"`
+}
+
+func UserPostsByID(uid int) ([]*Post, error) {
+	ctx, db := backend.Connect()
+	defer db.Close()
+
+	var userPosts []*Post
+	err := pgxscan.Select(ctx, db, &userPosts, `Select * FROM posts`)
+	if err != nil {
+		return nil, fmt.Errorf("error: %w", err)
+	}
+	return userPosts, nil
 }
 
 func CreatePosts(userPost, email string) (*Post, error) {
