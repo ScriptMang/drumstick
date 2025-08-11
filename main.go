@@ -121,7 +121,20 @@ func vetLogin(c echo.Context) error {
 
 	c.SetCookie(ck)
 	c.Request().AddCookie(ck)
-	return c.Render(http.StatusOK, "posts", "Add Posts to Your Feed")
+
+	uid, uidErr := accts.UserIDByEmail(usr)
+	if uidErr != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err)
+	}
+
+	userPosts, qryErr := posts.UserPostsByID(uid)
+	if qryErr != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, qryErr)
+	}
+
+	return c.Render(http.StatusOK, "posts", map[string]any{
+		"Posts": userPosts,
+	})
 }
 
 // this funct is only  for testing purpsos
@@ -170,17 +183,30 @@ func addPosts(c echo.Context) error {
 		return retrievalErr
 	}
 
-	newPost, err := posts.CreatePosts(myPost, claims.Email)
+	_, err := posts.CreatePosts(myPost, claims.Email)
 
 	// handle errs where creating a post fails
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err)
 	}
 
+	// get userid by email
+	uid, uidErr := accts.UserIDByEmail(claims.Email)
+	if uidErr != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err)
+	}
+
+	userPosts, qryErr := posts.UserPostsByID(uid)
+	if qryErr != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, qryErr)
+	}
+
 	// pass list of the user posts
 	// to their posts page
 
-	return c.Render(http.StatusOK, "refresh", newPost.Content)
+	return c.Render(http.StatusOK, "posts", map[string]any{
+		"Posts": userPosts,
+	})
 }
 
 func main() {

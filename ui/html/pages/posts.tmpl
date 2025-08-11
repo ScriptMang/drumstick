@@ -13,8 +13,8 @@
   
    <p> This is the User's Posts page</p>
    <a href="/"> sign out</a><br>
- 
-   <form action= "/refresh" method="post">   
+   
+ <form action= "/refresh" method="post">   
      <label for="content">write post</label><br>
      <textarea id="content" name="content" rows="8" cols="50" maxlength="140"></textarea><br>
       <input type="submit" value="submit">
@@ -22,12 +22,16 @@
 
 
     <h3> My Feed</h3>
+    <hr>
 
-    <hr>
-    <p>{{.}}</p>
-    <hr>
-    
-    </body>
+  {{range .Posts}}
+   <div style="margin-bottom: 5rem">
+    <p><strong>{{.Content}}</strong></p>
+   </div>
+   <hr>
+   {{end}}
+
+
+  </body>
 </html>
-
 {{end}}
