@@ -42,7 +42,8 @@ CREATE TABLE public.posts (
     user_id integer NOT NULL,
     parent_id integer NOT NULL,
     thread_id integer DEFAULT nextval('public.posts_thread_id_seq'::regclass) NOT NULL,
-    content character varying(350) NOT NULL
+    content character varying(350) NOT NULL,
+    CONSTRAINT non_empty_column CHECK ((length(TRIM(BOTH FROM content)) > 0))
 );
 
 

@@ -8,6 +8,7 @@ import (
 
 	"github.com/georgysavva/scany/v2/pgxscan"
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
 )
 
 type Post struct {
@@ -51,9 +52,13 @@ func CreatePosts(userPost, email string) (*Post, error) {
 		&tempPost.ThreadID, &tempPost.Content,
 	)
 
-	// check list all the errs
 	if err != nil {
-		return nil, fmt.Errorf("error: %w", err)
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) {
+			return nil, fmt.Errorf("error: %s", pgErr.Message)
+		}
 	}
+
+	// check list all the errs
 	return tempPost, nil
 }
