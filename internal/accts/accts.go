@@ -24,6 +24,7 @@ type UserProfile struct {
 
 type UserAccount struct {
 	ID        int      `json:"id" form:"id"`
+	Username  string   `json:"username" form:"username"`
 	Email     string   `json:"email" form:"email"`
 	Password  []byte   `json:"password" form:"password"`
 	Followers []string `json:"followers" form:"followers"`
@@ -33,6 +34,7 @@ type Account struct {
 	ID       int    `json:"id,omitempty" form:"id"`
 	Fname    string `json:"fname" form:"fname"`
 	Lname    string `json:"lname" form:"lname"`
+	Username string `json:"username" form:"username"`
 	Address  string `json:"address" form:"address"`
 	Email    string `json:"email" form:"email"`
 	Password []byte `json:"password" form:"password"`
@@ -173,6 +175,7 @@ func VetAllFields(acct Account) []error {
 	tmpErrs = append(tmpErrs, fieldIsEmpty(acct.Fname, "fname"))
 	tmpErrs = append(tmpErrs, fieldIsEmpty(acct.Lname, "lname"))
 	tmpErrs = append(tmpErrs, fieldIsEmpty(acct.Address, "address"))
+	tmpErrs = append(tmpErrs, fieldIsEmpty(acct.Username, "username"))
 	tmpErrs = append(tmpErrs, fieldIsEmpty(acct.Email, "email"))
 
 	tmpErrs = append(tmpErrs, fieldHasPunct(acct.Fname, "fname"))
@@ -306,8 +309,8 @@ func addUserAcct(acct *Account) error {
 
 	var tempID int
 	err = db.QueryRow(ctx,
-		`INSERT INTO user_account(email, password) VALUES($1, $2) RETURNING id`,
-		acct.Email, acct.Password,
+		`INSERT INTO user_account(username, email, password) VALUES($1, $2, $3) RETURNING id`,
+		acct.Username, acct.Email, acct.Password,
 	).Scan(&tempID)
 
 	if err != nil {

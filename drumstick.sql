@@ -55,6 +55,7 @@ ALTER TABLE public.posts OWNER TO <username>;
 
 CREATE TABLE public.user_account (
     id integer NOT NULL,
+    username character varying(40) NOT NULL,
     email character varying(30) NOT NULL,
     password bytea NOT NULL,
     followers character varying[]
@@ -148,7 +149,7 @@ COPY public.posts (user_id, parent_id, thread_id, content) FROM stdin;
 -- Data for Name: user_account; Type: TABLE DATA; Schema: public; Owner: <username>
 --
 
-COPY public.user_account (id, email, password, followers) FROM stdin;
+COPY public.user_account (id, username, email, password, followers) FROM stdin;
 \.
 
 
@@ -182,6 +183,22 @@ SELECT pg_catalog.setval('public.user_profile_id_seq', 1, false);
 
 
 --
+-- Name: user_account user_account_email_key; Type: CONSTRAINT; Schema: public; Owner: <username>
+--
+
+ALTER TABLE ONLY public.user_account
+    ADD CONSTRAINT user_account_email_key UNIQUE (email);
+
+
+--
+-- Name: user_account user_account_followers_key; Type: CONSTRAINT; Schema: public; Owner: <username>
+--
+
+ALTER TABLE ONLY public.user_account
+    ADD CONSTRAINT user_account_followers_key UNIQUE (followers);
+
+
+--
 -- Name: user_account user_account_password_key; Type: CONSTRAINT; Schema: public; Owner: <username>
 --
 
@@ -202,7 +219,7 @@ ALTER TABLE ONLY public.user_account
 --
 
 ALTER TABLE ONLY public.user_account
-    ADD CONSTRAINT user_account_username_key UNIQUE (email);
+    ADD CONSTRAINT user_account_username_key UNIQUE (username);
 
 
 --
@@ -234,7 +251,7 @@ ALTER TABLE ONLY public.user_profile
 --
 
 ALTER TABLE ONLY public.posts
-    ADD CONSTRAINT fk_user_account FOREIGN KEY (user_id) REFERENCES public.user_account(id);
+    ADD CONSTRAINT fk_user_account FOREIGN KEY (user_id) REFERENCES public.user_account(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --

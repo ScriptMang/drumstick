@@ -29,6 +29,7 @@ func accountCreation(c echo.Context) error {
 	newAcct.Fname = c.FormValue("fname")
 	newAcct.Lname = c.FormValue("lname")
 	newAcct.Address = c.FormValue("address")
+	newAcct.Username = c.FormValue("username")
 	newAcct.Email = c.FormValue("email")
 	newAcct.Password = []byte(c.FormValue("password"))
 
@@ -73,7 +74,19 @@ func accountCreation(c echo.Context) error {
 	c.Request().AddCookie(ck)
 
 	// fmt.Println(resp)
-	return c.Render(http.StatusOK, "posts", "Add Posts to Your Feed")
+	uid, uidErr := accts.UserIDByEmail(newAcct.Email)
+	if uidErr != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err)
+	}
+
+	userPosts, qryErr := posts.UserPostsByID(uid)
+	if qryErr != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, qryErr)
+	}
+
+	return c.Render(http.StatusOK, "posts", map[string]any{
+		"Posts": userPosts,
+	})
 }
 
 func homePage(c echo.Context) error {
