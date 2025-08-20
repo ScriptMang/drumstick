@@ -15,7 +15,21 @@ type Post struct {
 	UserID   int    `json:"user_id" form:"user_id"`
 	ParentID int    `json:"parent_id"`
 	ThreadID int    `json:"thread_id"`
+	Username string `json:"username" form:"username"`
 	Content  string `json:"content" form:"content"`
+}
+
+func usernameByID(id int) (string, error) {
+	ctx, db := backend.Connect()
+	defer db.Close()
+
+	var username string
+	err := db.QueryRow(ctx,
+		`Select username FROM user_account WHERE id=$1`, id).Scan(&username)
+	if err != nil {
+		return "", fmt.Errorf("error: %w", err)
+	}
+	return username, nil
 }
 
 func UserPostsByID(uid int) ([]*Post, error) {
@@ -45,11 +59,16 @@ func CreatePosts(userPost, email string) (*Post, error) {
 	}
 
 	// add posts to posts
+	username, userNameErr := usernameByID(uid)
+	if userNameErr != nil {
+		return nil, fmt.Errorf("error: %v\n", userNameErr)
+	}
+
 	var tempPost = new(Post)
-	err := db.QueryRow(ctx, `INSERT INTO posts(user_id, parent_id, content)`+
-		` VALUES($1,$2,$3) RETURNING *`, uid, 0, userPost).Scan(
+	err := db.QueryRow(ctx, `INSERT INTO posts(user_id, parent_id, username, content)`+
+		` VALUES($1,$2,$3,$4) RETURNING *`, uid, 0, username, userPost).Scan(
 		&tempPost.UserID, &tempPost.ParentID,
-		&tempPost.ThreadID, &tempPost.Content,
+		&tempPost.ThreadID, &tempPost.Username, &tempPost.Content,
 	)
 
 	if err != nil {

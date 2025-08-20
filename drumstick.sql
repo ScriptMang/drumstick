@@ -2,8 +2,10 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 16.9 (Homebrew)
--- Dumped by pg_dump version 16.9 (Homebrew)
+\restrict xIB8oa6OL1g4W2kgqB6ttDmSQdalyoWow5wgfGhof14LWv70TjhknIVbzwgYgcH
+
+-- Dumped from database version 16.10 (Homebrew)
+-- Dumped by pg_dump version 16.10 (Homebrew)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -16,20 +18,6 @@ SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
 
---
--- Name: posts_thread_id_seq; Type: SEQUENCE; Schema: public; Owner: <username>
---
-
-CREATE SEQUENCE public.posts_thread_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER SEQUENCE public.posts_thread_id_seq OWNER TO <username>;
-
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
@@ -41,13 +29,36 @@ SET default_table_access_method = heap;
 CREATE TABLE public.posts (
     user_id integer NOT NULL,
     parent_id integer NOT NULL,
-    thread_id integer DEFAULT nextval('public.posts_thread_id_seq'::regclass) NOT NULL,
+    thread_id integer NOT NULL,
+    username character varying(30) NOT NULL,
     content character varying(350) NOT NULL,
     CONSTRAINT non_empty_column CHECK ((length(TRIM(BOTH FROM content)) > 0))
 );
 
 
 ALTER TABLE public.posts OWNER TO <username>;
+
+--
+-- Name: posts_thread_id_seq; Type: SEQUENCE; Schema: public; Owner: <username>
+--
+
+CREATE SEQUENCE public.posts_thread_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.posts_thread_id_seq OWNER TO <username>;
+
+--
+-- Name: posts_thread_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: <username>
+--
+
+ALTER SEQUENCE public.posts_thread_id_seq OWNED BY public.posts.thread_id;
+
 
 --
 -- Name: user_account; Type: TABLE; Schema: public; Owner: <username>
@@ -124,6 +135,13 @@ ALTER SEQUENCE public.user_profile_id_seq OWNED BY public.user_profile.id;
 
 
 --
+-- Name: posts thread_id; Type: DEFAULT; Schema: public; Owner: <username>
+--
+
+ALTER TABLE ONLY public.posts ALTER COLUMN thread_id SET DEFAULT nextval('public.posts_thread_id_seq'::regclass);
+
+
+--
 -- Name: user_account id; Type: DEFAULT; Schema: public; Owner: <username>
 --
 
@@ -141,7 +159,7 @@ ALTER TABLE ONLY public.user_profile ALTER COLUMN id SET DEFAULT nextval('public
 -- Data for Name: posts; Type: TABLE DATA; Schema: public; Owner: <username>
 --
 
-COPY public.posts (user_id, parent_id, thread_id, content) FROM stdin;
+COPY public.posts (user_id, parent_id, thread_id, username, content) FROM stdin;
 \.
 
 
@@ -180,6 +198,14 @@ SELECT pg_catalog.setval('public.user_account_id_seq', 1, false);
 --
 
 SELECT pg_catalog.setval('public.user_profile_id_seq', 1, false);
+
+
+--
+-- Name: posts posts_user_id_parent_id_thread_id_username_content_key; Type: CONSTRAINT; Schema: public; Owner: <username>
+--
+
+ALTER TABLE ONLY public.posts
+    ADD CONSTRAINT posts_user_id_parent_id_thread_id_username_content_key UNIQUE (user_id, parent_id, thread_id, username, content);
 
 
 --
@@ -247,11 +273,19 @@ ALTER TABLE ONLY public.user_profile
 
 
 --
--- Name: posts fk_user_account; Type: FK CONSTRAINT; Schema: public; Owner: <username>
+-- Name: posts fk_user_account_id; Type: FK CONSTRAINT; Schema: public; Owner: <username>
 --
 
 ALTER TABLE ONLY public.posts
-    ADD CONSTRAINT fk_user_account FOREIGN KEY (user_id) REFERENCES public.user_account(id) ON UPDATE CASCADE ON DELETE CASCADE;
+    ADD CONSTRAINT fk_user_account_id FOREIGN KEY (user_id) REFERENCES public.user_account(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: posts fk_user_account_username; Type: FK CONSTRAINT; Schema: public; Owner: <username>
+--
+
+ALTER TABLE ONLY public.posts
+    ADD CONSTRAINT fk_user_account_username FOREIGN KEY (username) REFERENCES public.user_account(username) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
@@ -265,4 +299,6 @@ ALTER TABLE ONLY public.user_profile
 --
 -- PostgreSQL database dump complete
 --
+
+\unrestrict xIB8oa6OL1g4W2kgqB6ttDmSQdalyoWow5wgfGhof14LWv70TjhknIVbzwgYgcH
 
