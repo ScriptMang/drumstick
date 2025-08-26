@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"scriptmang/drumstick/internal/accts"
 	"scriptmang/drumstick/internal/backend"
+	"time"
 
 	"github.com/georgysavva/scany/v2/pgxscan"
 	"github.com/jackc/pgx/v5"
@@ -12,11 +13,13 @@ import (
 )
 
 type Post struct {
-	UserID   int    `json:"user_id" form:"user_id"`
-	ParentID int    `json:"parent_id"`
-	ThreadID int    `json:"thread_id"`
-	Username string `json:"username" form:"username"`
-	Content  string `json:"content" form:"content"`
+	UserID    int       `json:"user_id" form:"user_id"`
+	ParentID  int       `json:"parent_id"`
+	ThreadID  int       `json:"thread_id"`
+	Username  string    `json:"username" form:"username"`
+	Content   string    `json:"content" form:"content"`
+	CreatedOn time.Time `json:"created_on"`
+	Date      string
 }
 
 func usernameByID(id int) (string, error) {
@@ -41,6 +44,11 @@ func UserPostsByID(uid int) ([]*Post, error) {
 	if err != nil {
 		return nil, fmt.Errorf("error: %w", err)
 	}
+
+	for _, pst := range userPosts {
+		pst.Date = pst.CreatedOn.Format("01/02/2006")
+	}
+
 	return userPosts, nil
 }
 
@@ -58,7 +66,7 @@ func CreatePosts(userPost, email string) (*Post, error) {
 		return nil, fmt.Errorf("error: %w", uidErr)
 	}
 
-	// add posts to posts
+	// get the  user's  username
 	username, userNameErr := usernameByID(uid)
 	if userNameErr != nil {
 		return nil, fmt.Errorf("error: %v\n", userNameErr)
@@ -68,7 +76,8 @@ func CreatePosts(userPost, email string) (*Post, error) {
 	err := db.QueryRow(ctx, `INSERT INTO posts(user_id, parent_id, username, content)`+
 		` VALUES($1,$2,$3,$4) RETURNING *`, uid, 0, username, userPost).Scan(
 		&tempPost.UserID, &tempPost.ParentID,
-		&tempPost.ThreadID, &tempPost.Username, &tempPost.Content,
+		&tempPost.ThreadID, &tempPost.Username,
+		&tempPost.Content, &tempPost.CreatedOn,
 	)
 
 	if err != nil {

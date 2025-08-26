@@ -1,0 +1,36 @@
+.post-container {
+    margin-bottom: 0;
+    padding: 0;
+}
+
+.posts-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 5px;
+    margin-bottom: 0.25rem;
+}
+
+.posts-body {
+    display: block;
+    padding: 0;
+    margin-left: 1rem;
+}
+
+.posts-item {
+    padding: 0;
+}
+
+.posts-row p, .posts-body p {
+    margin: 0;
+    line-height: 1.2;
+}
+
+.posts-separator {
+    margin: 0.5rem 0;
+    border: none;
+    border-top: 1px solid black;
+}
+ 
+.bottom-separator {
+    margin-top: 4rem;
+}

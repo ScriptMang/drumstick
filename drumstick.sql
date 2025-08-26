@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict xIB8oa6OL1g4W2kgqB6ttDmSQdalyoWow5wgfGhof14LWv70TjhknIVbzwgYgcH
+\restrict kjat48JEwxUStXA4GnmmegyFEUjW5UWBb3apRFcL9rp6CJIGB2HyW9kbVVQuulT
 
 -- Dumped from database version 16.10 (Homebrew)
 -- Dumped by pg_dump version 16.10 (Homebrew)
@@ -32,6 +32,7 @@ CREATE TABLE public.posts (
     thread_id integer NOT NULL,
     username character varying(30) NOT NULL,
     content character varying(350) NOT NULL,
+    created_on date DEFAULT CURRENT_DATE NOT NULL,
     CONSTRAINT non_empty_column CHECK ((length(TRIM(BOTH FROM content)) > 0))
 );
 
@@ -159,7 +160,7 @@ ALTER TABLE ONLY public.user_profile ALTER COLUMN id SET DEFAULT nextval('public
 -- Data for Name: posts; Type: TABLE DATA; Schema: public; Owner: <username>
 --
 
-COPY public.posts (user_id, parent_id, thread_id, username, content) FROM stdin;
+COPY public.posts (user_id, parent_id, thread_id, username, content, created_on) FROM stdin;
 \.
 
 
@@ -198,14 +199,6 @@ SELECT pg_catalog.setval('public.user_account_id_seq', 1, false);
 --
 
 SELECT pg_catalog.setval('public.user_profile_id_seq', 1, false);
-
-
---
--- Name: posts posts_user_id_parent_id_thread_id_username_content_key; Type: CONSTRAINT; Schema: public; Owner: <username>
---
-
-ALTER TABLE ONLY public.posts
-    ADD CONSTRAINT posts_user_id_parent_id_thread_id_username_content_key UNIQUE (user_id, parent_id, thread_id, username, content);
 
 
 --
@@ -300,5 +293,5 @@ ALTER TABLE ONLY public.user_profile
 -- PostgreSQL database dump complete
 --
 
-\unrestrict xIB8oa6OL1g4W2kgqB6ttDmSQdalyoWow5wgfGhof14LWv70TjhknIVbzwgYgcH
+\unrestrict kjat48JEwxUStXA4GnmmegyFEUjW5UWBb3apRFcL9rp6CJIGB2HyW9kbVVQuulT
 

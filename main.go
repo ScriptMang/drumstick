@@ -233,8 +233,9 @@ func main() {
 	router.Use(middleware.Logger())
 	router.Use(middleware.Recover())
 
-	router.Renderer = tm
+	router.Static("static", "ui/static/")
 
+	router.Renderer = tm
 	router.GET("/", homePage)
 	router.GET("/signup", signUp)
 	router.GET("/loginForm", loginForm)
