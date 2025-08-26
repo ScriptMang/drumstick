@@ -7,8 +7,8 @@
 - [x] Users can signup and create accounts
 - [x] Users can login
 - [x] Jwt auth is implemented
-- [ ] Users can create posts
-- [ ] Users can reply to posts
+- [x] Users can create posts
+- [ ] Users can reply to each other's posts
 - [ ] Users can delete their posts.
 - [ ] Users can edit their posts.
 - [ ] Secure all user post routes with JWT auth.
@@ -66,31 +66,42 @@
 
 ### Homepage
 
-The homepage is the welcome page that contains a welcome message and links to the signup and login page.
+The homepage is the welcome page for the site that  links to the signup and login page.
 The route is located at `Get localhost:8080/`.
 
 
 ### SignUp
 
-The signup page is where you fill out a form to create an account. 
+The signup page is where you fill out a form to create an account.
 Its route method is `GET localhost:8080/signup`. If account creation fails the errors will be listed
 in json format. On success the account is created in the database and your logged into the posts page. 
 
-### View 
 
-Once the user fills out the the loginForm and clicks submit 
-a post route with that form data `POST localhost:8080/view` 
-creates the user's account. If there is any error with any of the fields
-the fields and their errors are returned in json format.
+### View
 
-### LoginForm
+After submitting an account for creation from the signup route a 
+http request to `Post localhost:8080/view` creates the account on the database.
+After successfully creating their account, the user automatically logged in 
+and is redirected to their posts route.
 
-The loginForm is a form page where users login; the request is at `GET` `localhost:8080/loginForm`.
-Once submitted, its authenticated at post route `Post` `localhost:8080/view`.
+### Login
+
+Where the user logs in; the request is at `GET` `localhost:8080/login`.
+Once submitted, its authenticated at post route `Post` `localhost:8080/posts`.
 
 
-### Posts wip
+### Posts
 
-The Post page using the route `POST localhost:8080/posts` given the login form data
-authenticates the user's credentials. The Posts page is the where the users can view
-and modify their posts. This page is still a work in progress.
+After login, the user will have access to their Posts page which is their homepage.
+The route is located at `localhost:8080/posts`. The Posts page is the where the users 
+can view and submit posts. New posts are submitted via `POST localhost:8080`.
+Each Post contains the user's username, the date the post was submitted, and 
+the post's body. The max size of the post's body is 350 characters. 
+
+#### Current Progress
+
+As for what can be done with posts, currently the user 
+can only submit new posts to themselves, not replies to other users.
+Posts also, can't be edited or deleted.  Being able to make replies
+and delete or edit your posts are wips.
+
