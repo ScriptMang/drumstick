@@ -238,7 +238,7 @@ func main() {
 	router.Renderer = tm
 	router.GET("/", homePage)
 	router.GET("/signup", signUp)
-	router.GET("/loginForm", loginForm)
+	router.GET("/login", loginForm)
 	router.POST("/view", accountCreation)
 	router.POST("/posts", vetLogin)
 	router.POST("/refresh", addPosts)
