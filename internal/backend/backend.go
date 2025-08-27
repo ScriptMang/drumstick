@@ -2,7 +2,7 @@ package backend
 
 import (
 	"context"
-	"fmt"
+	"log"
 	"os"
 
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -15,7 +15,7 @@ func Connect() (context.Context, *pgxpool.Pool) {
 	dbURL := os.Getenv("DATABASE_URL")
 	conn, err := pgxpool.New(ctx, dbURL)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Unable to connect to database: %v\n", err)
+		log.Printf("Unable to connect to database: %s\n", err.Error())
 		os.Exit(1)
 	}
 
