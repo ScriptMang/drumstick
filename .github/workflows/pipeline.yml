@@ -3,8 +3,9 @@ name: CI Checks
 on:
   push:
     branches: [ "main" ]
-    pull_request:
-      branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
 jobs:
   build:
     name: Build App
@@ -19,7 +20,7 @@ jobs:
       - name: Set up Go 1.25.0
         uses: actions/setup-go@v5
         with:
-        go-version: '1.25'
+          go-version: '1.25'
 
       # step 3: install dependencies
       - name: Install dependencies
