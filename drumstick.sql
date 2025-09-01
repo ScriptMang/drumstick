@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict kjat48JEwxUStXA4GnmmegyFEUjW5UWBb3apRFcL9rp6CJIGB2HyW9kbVVQuulT
+\restrict VhwOz51jH0Ccgp018Vp02iuE9PSeCyFcec0TAvqSInDe0825dBjQFMZ5qnY8HYs
 
 -- Dumped from database version 16.10 (Homebrew)
 -- Dumped by pg_dump version 16.10 (Homebrew)
@@ -27,9 +27,8 @@ SET default_table_access_method = heap;
 --
 
 CREATE TABLE public.posts (
+    id integer NOT NULL,
     user_id integer NOT NULL,
-    parent_id integer NOT NULL,
-    thread_id integer NOT NULL,
     username character varying(30) NOT NULL,
     content character varying(350) NOT NULL,
     created_on date DEFAULT CURRENT_DATE NOT NULL,
@@ -40,10 +39,10 @@ CREATE TABLE public.posts (
 ALTER TABLE public.posts OWNER TO <username>;
 
 --
--- Name: posts_thread_id_seq; Type: SEQUENCE; Schema: public; Owner: <username>
+-- Name: posts_id_seq; Type: SEQUENCE; Schema: public; Owner: <username>
 --
 
-CREATE SEQUENCE public.posts_thread_id_seq
+CREATE SEQUENCE public.posts_id_seq
     AS integer
     START WITH 1
     INCREMENT BY 1
@@ -52,13 +51,13 @@ CREATE SEQUENCE public.posts_thread_id_seq
     CACHE 1;
 
 
-ALTER SEQUENCE public.posts_thread_id_seq OWNER TO <username>;
+ALTER SEQUENCE public.posts_id_seq OWNER TO <username>;
 
 --
--- Name: posts_thread_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: <username>
+-- Name: posts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: <username>
 --
 
-ALTER SEQUENCE public.posts_thread_id_seq OWNED BY public.posts.thread_id;
+ALTER SEQUENCE public.posts_id_seq OWNED BY public.posts.id;
 
 
 --
@@ -136,10 +135,10 @@ ALTER SEQUENCE public.user_profile_id_seq OWNED BY public.user_profile.id;
 
 
 --
--- Name: posts thread_id; Type: DEFAULT; Schema: public; Owner: <username>
+-- Name: posts id; Type: DEFAULT; Schema: public; Owner: <username>
 --
 
-ALTER TABLE ONLY public.posts ALTER COLUMN thread_id SET DEFAULT nextval('public.posts_thread_id_seq'::regclass);
+ALTER TABLE ONLY public.posts ALTER COLUMN id SET DEFAULT nextval('public.posts_id_seq'::regclass);
 
 
 --
@@ -160,7 +159,7 @@ ALTER TABLE ONLY public.user_profile ALTER COLUMN id SET DEFAULT nextval('public
 -- Data for Name: posts; Type: TABLE DATA; Schema: public; Owner: <username>
 --
 
-COPY public.posts (user_id, parent_id, thread_id, username, content, created_on) FROM stdin;
+COPY public.posts (id, user_id, username, content, created_on) FROM stdin;
 \.
 
 
@@ -181,10 +180,10 @@ COPY public.user_profile (id, user_id, fname, lname, address) FROM stdin;
 
 
 --
--- Name: posts_thread_id_seq; Type: SEQUENCE SET; Schema: public; Owner: <username>
+-- Name: posts_id_seq; Type: SEQUENCE SET; Schema: public; Owner: <username>
 --
 
-SELECT pg_catalog.setval('public.posts_thread_id_seq', 1, false);
+SELECT pg_catalog.setval('public.posts_id_seq', 1, false);
 
 
 --
@@ -199,6 +198,14 @@ SELECT pg_catalog.setval('public.user_account_id_seq', 1, false);
 --
 
 SELECT pg_catalog.setval('public.user_profile_id_seq', 1, false);
+
+
+--
+-- Name: posts posts_pkey; Type: CONSTRAINT; Schema: public; Owner: <username>
+--
+
+ALTER TABLE ONLY public.posts
+    ADD CONSTRAINT posts_pkey PRIMARY KEY (id);
 
 
 --
@@ -293,5 +300,5 @@ ALTER TABLE ONLY public.user_profile
 -- PostgreSQL database dump complete
 --
 
-\unrestrict kjat48JEwxUStXA4GnmmegyFEUjW5UWBb3apRFcL9rp6CJIGB2HyW9kbVVQuulT
+\unrestrict VhwOz51jH0Ccgp018Vp02iuE9PSeCyFcec0TAvqSInDe0825dBjQFMZ5qnY8HYs
 
