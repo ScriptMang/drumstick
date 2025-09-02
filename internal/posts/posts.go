@@ -14,8 +14,6 @@ import (
 
 type Post struct {
 	UserID    int       `json:"user_id" form:"user_id"`
-	ParentID  int       `json:"parent_id"`
-	ThreadID  int       `json:"thread_id"`
 	Username  string    `json:"username" form:"username"`
 	Content   string    `json:"content" form:"content"`
 	CreatedOn time.Time `json:"created_on"`
@@ -73,10 +71,9 @@ func CreatePosts(userPost, email string) (*Post, error) {
 	}
 
 	var tempPost = new(Post)
-	err := db.QueryRow(ctx, `INSERT INTO posts(user_id, parent_id, username, content)`+
-		` VALUES($1,$2,$3,$4) RETURNING *`, uid, 0, username, userPost).Scan(
-		&tempPost.UserID, &tempPost.ParentID,
-		&tempPost.ThreadID, &tempPost.Username,
+	err := db.QueryRow(ctx, `INSERT INTO posts(user_id, username, content)`+
+		` VALUES($1,$2,$3) RETURNING *`, uid, username, userPost).Scan(
+		&tempPost.UserID, &tempPost.Username,
 		&tempPost.Content, &tempPost.CreatedOn,
 	)
 
