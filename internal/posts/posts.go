@@ -38,7 +38,7 @@ func UserPostsByID(uid int) ([]*Post, error) {
 	defer db.Close()
 
 	var userPosts []*Post
-	err := pgxscan.Select(ctx, db, &userPosts, `Select * FROM posts`)
+	err := pgxscan.Select(ctx, db, &userPosts, `Select * FROM posts WHERE user_id = $1`, uid)
 	if err != nil {
 		return nil, fmt.Errorf("error: %w", err)
 	}
