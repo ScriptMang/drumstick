@@ -288,12 +288,6 @@ func addUserAcct(acct *Account) error {
 	acct.Password, err = encryptPassword(acct.Password)
 	if err != nil {
 
-		var pgErr *pgconn.PgError
-		if errors.As(err, &pgErr) {
-			fmt.Println(pgErr.Code)
-			fmt.Println(pgErr.Message)
-		}
-
 		if errors.Is(err, bcrypt.ErrPasswordTooLong) {
 			// fmt.Println(err)
 			return err
@@ -304,7 +298,7 @@ func addUserAcct(acct *Account) error {
 			return err
 		}
 
-		return fmt.Errorf("error: %s, code: %s", pgErr.Message, pgErr.Code)
+		return fmt.Errorf("%w", err)
 	}
 
 	var tempID int
@@ -314,12 +308,15 @@ func addUserAcct(acct *Account) error {
 	).Scan(&tempID)
 
 	if err != nil {
+		var connErr *pgconn.ConnectError
+		if errors.As(err, &connErr) {
+			return errors.New("db_auth:bad_creds:failed to connect to database")
+		}
+
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) {
-			fmt.Println(pgErr.Code)
-			fmt.Println(pgErr.Message)
+			return errors.New(pgErr.Message)
 		}
-		return fmt.Errorf("error: %s, code: %s", pgErr.Message, pgErr.Code)
 	}
 
 	acct.ID = tempID
