@@ -13,6 +13,7 @@ import (
 )
 
 type Post struct {
+	ID        int       `json:"id" form:"id"`
 	UserID    int       `json:"user_id" form:"user_id"`
 	Username  string    `json:"username" form:"username"`
 	Content   string    `json:"content" form:"content"`
@@ -73,7 +74,7 @@ func CreatePosts(userPost, email string) (*Post, error) {
 	var tempPost = new(Post)
 	err := db.QueryRow(ctx, `INSERT INTO posts(user_id, username, content)`+
 		` VALUES($1,$2,$3) RETURNING *`, uid, username, userPost).Scan(
-		&tempPost.UserID, &tempPost.Username,
+		&tempPost.ID, &tempPost.UserID, &tempPost.Username,
 		&tempPost.Content, &tempPost.CreatedOn,
 	)
 
