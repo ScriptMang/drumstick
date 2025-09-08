@@ -138,6 +138,35 @@ func vetLogin(c echo.Context) error {
 	return c.Redirect(http.StatusSeeOther, "/posts")
 }
 
+func viewFeed(c echo.Context) error {
+
+	t, err := c.Cookie("auth")
+	if err != nil {
+		return c.HTML(http.StatusUnauthorized,
+			"No authorization token",
+		)
+	}
+
+	claims, err := sessionmanager.GetUserCustomClaims(t.Value, []byte(os.Getenv("HMAC_SECRET")))
+
+	if errors.Is(err, jwt.ErrTokenExpired) {
+		return errors.New("token error: token Expired")
+	}
+
+	if errors.Is(err, jwt.ErrSignatureInvalid) {
+		return errors.New("token error: token has an invalid signature")
+	}
+
+	if errors.Is(err, jwt.ErrTokenRequiredClaimMissing) {
+		return errors.New("token error: token is missing required claims")
+	}
+
+	if errors.Is(err, jwt.ErrTokenSignatureInvalid) {
+		return errors.New("token error: token signature is invalid")
+	}
+
+	email := claims.Email
+	uid, uidErr := accts.UserIDByEmail(email)
 	if uidErr != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err)
 	}
@@ -205,23 +234,7 @@ func addPosts(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, err)
 	}
 
-	// get userid by email
-	uid, uidErr := accts.UserIDByEmail(claims.Email)
-	if uidErr != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, err)
-	}
-
-	userPosts, qryErr := posts.UserPostsByID(uid)
-	if qryErr != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, qryErr)
-	}
-
-	// pass list of the user posts
-	// to their posts page
-
-	return c.Render(http.StatusOK, "posts", map[string]any{
-		"Posts": userPosts,
-	})
+	return c.Redirect(http.StatusSeeOther, "/posts")
 }
 
 func main() {
@@ -241,10 +254,11 @@ func main() {
 	router.GET("/", homePage)
 	router.GET("/signup", signUp)
 	router.POST("/view", accountCreation)
-	router.POST("/refresh", addPosts)
 	router.GET("/login", loginForm)
 	router.POST("/login", vetLogin)
 
+	router.GET("/posts", viewFeed)
+	router.POST("/posts", addPosts)
 
 	r := router.Group("/restricted")
 
