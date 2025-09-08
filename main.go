@@ -135,7 +135,9 @@ func vetLogin(c echo.Context) error {
 	c.SetCookie(ck)
 	c.Request().AddCookie(ck)
 
-	uid, uidErr := accts.UserIDByEmail(usr)
+	return c.Redirect(http.StatusSeeOther, "/posts")
+}
+
 	if uidErr != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err)
 	}
@@ -238,12 +240,14 @@ func main() {
 	router.Renderer = tm
 	router.GET("/", homePage)
 	router.GET("/signup", signUp)
-	router.GET("/login", loginForm)
 	router.POST("/view", accountCreation)
-	router.POST("/posts", vetLogin)
 	router.POST("/refresh", addPosts)
+	router.GET("/login", loginForm)
+	router.POST("/login", vetLogin)
+
 
 	r := router.Group("/restricted")
+
 	// Configure middleware with the custom claims type
 	config := echojwt.Config{
 		NewClaimsFunc: func(c echo.Context) jwt.Claims {
