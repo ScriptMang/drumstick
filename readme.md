@@ -20,6 +20,7 @@
 - This program requires the go programming language,
   PostgreSQL and a terminal to be installed on your local machine.
   This program is meant to run on MacOS and Windows.
+ 
 
 ### Setup
 
@@ -77,10 +78,14 @@ If successful it redirects to the user's post page, other it errors.
 ### Posts
 
 After login, the user will have access to their Posts page which is their homepage.
-The route is located at `localhost:8080/posts`. The Posts page is the where the users 
+The route is located at ` GET localhost:8080/posts`. The Posts page is the where the users 
 can view and submit posts. New posts are submitted via `POST localhost:8080`.
 Each Post contains the user's username, the date the post was submitted, and 
 the post's body. The max size of the post's body is 350 characters. 
+
+Users can also delete their posts by clicking the delete button on any post
+or at `POST localhost:8080/posts/:id`.
+
 
 #### Current Progress
 
