@@ -25,21 +25,32 @@
     <h3> My Feed</h3>
   <hr class="post-separator">
   {{range .Posts}}
-   <div class="posts">
-      <div class="posts-row">
-        <div class="posts-item">
-          <p><strong>{{.Username}}</strong></p>
-        </div>
-   
+  <div class="posts">
+
+    <div class="posts-row">
+      <div class="posts-item">
+        <p><strong>{{.Username}}</strong></p>
+      </div>
+
         <div class="posts-item">
           <p><strong>{{.Date}}</strong></p>
         </div>
-      </div>
+     </div>
 
       <div class="posts-body">
         <p>{{.Content}}</p>
       </div>
+
+      <div class="meta-item">
+        <form action="/posts/{{.ID}}" method="post" style="display:inline;">
+         <input type="hidden" name="_method" value="DELETE">
+          <button type="submit" class="delete-bttn">delete</button>
+        </form>
+      </div>
+
    </div>
+
+   
    <hr class="posts-separator bottom-separator">
    {{end}}
 

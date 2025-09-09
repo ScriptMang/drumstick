@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 
 	"scriptmang/drumstick/internal/accts"
 	"scriptmang/drumstick/internal/posts"
@@ -213,6 +214,22 @@ func restricted(c echo.Context) error {
 	return c.Render(http.StatusOK, "sample", "Welcome "+email+"!")
 }
 
+func deletePosts(c echo.Context) error {
+
+	strPostID := c.Param("id")
+	postID, convErr := strconv.Atoi(strPostID)
+	if convErr != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, convErr)
+	}
+
+	deleteQueryErr := posts.DeletePostByID(postID)
+	if deleteQueryErr != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, deleteQueryErr)
+	}
+
+	return c.Redirect(http.StatusSeeOther, "/posts")
+}
+
 func addPosts(c echo.Context) error {
 	myPost := c.FormValue("content")
 
@@ -259,6 +276,7 @@ func main() {
 
 	router.GET("/posts", viewFeed)
 	router.POST("/posts", addPosts)
+	router.POST("/posts/:id", deletePosts)
 
 	r := router.Group("/restricted")
 

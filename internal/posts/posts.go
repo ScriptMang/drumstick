@@ -51,6 +51,20 @@ func UserPostsByID(uid int) ([]*Post, error) {
 	return userPosts, nil
 }
 
+// deletes the user's post given their post id
+// returns the new list of posts
+func DeletePostByID(postID int) error {
+	ctx, db := backend.Connect()
+	defer db.Close()
+
+	_, queryErr := db.Exec(ctx, `DELETE FROM POSTS WHERE id = $1`, postID)
+	if queryErr != nil {
+		return fmt.Errorf("error:%w", queryErr)
+	}
+
+	return nil
+}
+
 func CreatePosts(userPost, email string) (*Post, error) {
 	ctx, db := backend.Connect()
 	defer db.Close()
