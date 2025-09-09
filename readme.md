@@ -9,7 +9,7 @@
 - [x] Jwt auth is implemented
 - [x] Users can create posts
 - [ ] Users can reply to each other's posts
-- [ ] Users can delete their posts.
+- [x] Users can delete their posts.
 - [ ] Users can edit their posts.
 - [ ] Secure all user post routes with JWT auth.
 
@@ -17,9 +17,8 @@
 
 ### Programs to be installed
 
-- This program requires the go programming language
+- This program requires the go programming language,
   PostgreSQL and a terminal to be installed on your local machine.
-  Postman is also required to test routes and authentication.
   This program is meant to run on MacOS and Windows.
 
 ### Setup
@@ -35,9 +34,6 @@
 
 #### Windows
 - wip
-
-#### Postman
-- Postman can be downloaded from the website.
 
 ### Starting Postgresql
 
@@ -55,19 +51,14 @@
 
 - After you finsh setting up the database, just write `go run .`
   within the directory of the main.go file in the terminal.
-
-### Visiting the routes
-
-- To visits the routes provide Postman with the right request method 
-  and address given below. Postman provides a option to render html.
-
+  Then, start by visiting the homepage  `localhost:8080/`
 
 ## Routes
 
 ### Homepage
 
 The homepage is the welcome page for the site that  links to the signup and login page.
-The route is located at `Get localhost:8080/`.
+Its route is `GET localhost:8080/`.
 
 
 ### SignUp
@@ -76,18 +67,11 @@ The signup page is where you fill out a form to create an account.
 Its route method is `GET localhost:8080/signup`. If account creation fails the errors will be listed
 in json format. On success the account is created in the database and your logged into the posts page. 
 
-
-### View
-
-After submitting an account for creation from the signup route a 
-http request to `Post localhost:8080/view` creates the account on the database.
-After successfully creating their account, the user automatically logged in 
-and is redirected to their posts route.
-
 ### Login
 
-Where the user logs in; the request is at `GET` `localhost:8080/login`.
-Once submitted, its authenticated at post route `Post` `localhost:8080/posts`.
+Where the user logs in; the request is at `GET` `localhost:8080/login`
+and autenticates the credentials at `POST` `localhost:8080/login`.
+If successful it redirects to the user's post page, other it errors.
 
 
 ### Posts
@@ -100,8 +84,7 @@ the post's body. The max size of the post's body is 350 characters.
 
 #### Current Progress
 
-As for what can be done with posts, currently the user 
-can only submit new posts to themselves, not replies to other users.
-Posts also, can't be edited or deleted.  Being able to make replies
-and delete or edit your posts are wips.
+Currently the user can only create new posts to themselves an delete them.
+Users cannot reply to each other users. Posts also, can't be edited.
+Being able to make replies and edit your posts are wips.
 
