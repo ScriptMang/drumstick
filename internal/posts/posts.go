@@ -21,7 +21,7 @@ type Post struct {
 	Date      string
 }
 
-func usernameByID(id int) (string, error) {
+func UsernameByID(id int) (string, error) {
 	ctx, db := backend.Connect()
 	defer db.Close()
 
@@ -80,7 +80,7 @@ func CreatePosts(userPost, email string) (*Post, error) {
 	}
 
 	// get the  user's  username
-	username, userNameErr := usernameByID(uid)
+	username, userNameErr := UsernameByID(uid)
 	if userNameErr != nil {
 		return nil, fmt.Errorf("error: %v\n", userNameErr)
 	}

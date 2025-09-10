@@ -172,13 +172,19 @@ func viewFeed(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, err)
 	}
 
+	username, qryErr := posts.UsernameByID(uid)
+	if qryErr != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, qryErr)
+	}
+
 	userPosts, qryErr := posts.UserPostsByID(uid)
 	if qryErr != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, qryErr)
 	}
 
 	return c.Render(http.StatusOK, "posts", map[string]any{
-		"Posts": userPosts,
+		"Username": username,
+		"Posts":    userPosts,
 	})
 }
 
