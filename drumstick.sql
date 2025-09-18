@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict VhwOz51jH0Ccgp018Vp02iuE9PSeCyFcec0TAvqSInDe0825dBjQFMZ5qnY8HYs
+\restrict sv748ZPrec1z8g5Rdh4PyopMytExPhyQB6eMvqFOZkFhFdAtMg7iZvsx5APgSX3
 
 -- Dumped from database version 16.10 (Homebrew)
 -- Dumped by pg_dump version 16.10 (Homebrew)
@@ -28,6 +28,7 @@ SET default_table_access_method = heap;
 
 CREATE TABLE public.posts (
     id integer NOT NULL,
+    parent_id integer NOT NULL,
     user_id integer NOT NULL,
     username character varying(30) NOT NULL,
     content character varying(350) NOT NULL,
@@ -159,7 +160,7 @@ ALTER TABLE ONLY public.user_profile ALTER COLUMN id SET DEFAULT nextval('public
 -- Data for Name: posts; Type: TABLE DATA; Schema: public; Owner: <username>
 --
 
-COPY public.posts (id, user_id, username, content, created_on) FROM stdin;
+COPY public.posts (id, parent_id, user_id, username, content, created_on) FROM stdin;
 \.
 
 
@@ -300,5 +301,5 @@ ALTER TABLE ONLY public.user_profile
 -- PostgreSQL database dump complete
 --
 
-\unrestrict VhwOz51jH0Ccgp018Vp02iuE9PSeCyFcec0TAvqSInDe0825dBjQFMZ5qnY8HYs
+\unrestrict sv748ZPrec1z8g5Rdh4PyopMytExPhyQB6eMvqFOZkFhFdAtMg7iZvsx5APgSX3
 
