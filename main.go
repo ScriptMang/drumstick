@@ -80,7 +80,7 @@ func accountCreation(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, err)
 	}
 
-	userPosts, qryErr := posts.UserPostsByID(uid)
+	userPosts, qryErr := posts.UserPostsByUserID(uid)
 	if qryErr != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, qryErr)
 	}
@@ -177,7 +177,7 @@ func viewFeed(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, qryErr)
 	}
 
-	userPosts, qryErr := posts.UserPostsByID(uid)
+	userPosts, qryErr := posts.UserPostsByUserID(uid)
 	if qryErr != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, qryErr)
 	}

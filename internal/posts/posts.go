@@ -35,7 +35,7 @@ func UsernameByID(id int) (string, error) {
 	return username, nil
 }
 
-func UserPostsByID(uid int) ([]*Post, error) {
+func UserPostsByUserID(uid int) ([]*Post, error) {
 	ctx, db := backend.Connect()
 	defer db.Close()
 
