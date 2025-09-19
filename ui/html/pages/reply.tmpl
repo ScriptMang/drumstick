@@ -1,0 +1,28 @@
+{{define "reply"}}
+<!DOCTYPE html>
+<html lang='en'>
+  <head>
+     <meta charset='utf-8'>
+     <title>Reply to Post</title>
+  </head>
+<body>
+
+    <header>
+        <h1>Response Page</h1>
+    </header>
+   <a href="/"> sign out</a><br>
+
+<div class="post">
+ <h3>{{.ChildPostUsername}} in Response to {{ .ParentPost.Username }}:</h3>
+ <p>{{ .ParentPost.Content }}</p>
+</div>
+<hr>
+
+<form action="/posts/{{.ParentPost.ID}}/reply" method="POST">
+ <label for="reply">Your Response</label>
+ <textarea id="reply" name="reply" rows="6" cols="60"></textarea><br><br>
+ <button type="submit">Submit Reply</button>
+</form>
+  </body>
+</html>
+{{end}}

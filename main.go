@@ -230,6 +230,49 @@ func deletePosts(c echo.Context) error {
 	return c.Redirect(http.StatusSeeOther, "/posts")
 }
 
+func viewResponsePage(c echo.Context) error {
+
+	t, err := c.Cookie("auth")
+	if err != nil {
+		return c.HTML(http.StatusUnauthorized,
+			"No authorization token",
+		)
+	}
+
+	claims, err := sessionmanager.GetUserCustomClaims(t.Value, []byte(os.Getenv("HMAC_SECRET")))
+
+	email := claims.Email
+	uid, uidErr := accts.UserIDByEmail(email)
+	if uidErr != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err)
+	}
+
+	username, qryErr := posts.UsernameByID(uid)
+	if qryErr != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, qryErr)
+	}
+
+	strID := c.Param("id")
+	postID, convErr := strconv.Atoi(strID)
+	if convErr != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, convErr)
+	}
+
+	if qryErr != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, qryErr)
+	}
+
+	parentPost, err := posts.UserPostByID(postID)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err)
+	}
+
+	return c.Render(http.StatusOK, "reply", map[string]any{
+		"ChildPostUsername": username,
+		"ParentPost":        parentPost,
+	})
+}
+
 func addPosts(c echo.Context) error {
 	myPost := c.FormValue("content")
 
@@ -277,6 +320,7 @@ func main() {
 	router.GET("/posts", viewFeed)
 	router.POST("/posts", addPosts)
 	router.POST("/posts/:id", deletePosts)
+	router.GET("/posts/:id/reply", viewResponsePage)
 
 	r := router.Group("/restricted")
 

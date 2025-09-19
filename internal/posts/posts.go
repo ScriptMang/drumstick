@@ -52,6 +52,22 @@ func UserPostsByUserID(uid int) ([]*Post, error) {
 	return userPosts, nil
 }
 
+func UserPostByID(postID int) (Post, error) {
+	ctx, db := backend.Connect()
+	defer db.Close()
+
+	var tempPost Post
+	queryErr := db.QueryRow(ctx,
+		`SELECT id, user_id, username, content FROM posts WHERE id=$1`, postID).
+		Scan(&tempPost.ID, &tempPost.UserID, &tempPost.Username, &tempPost.Content)
+
+	if queryErr != nil {
+		return tempPost, fmt.Errorf("error: %w", queryErr)
+	}
+
+	return tempPost, nil
+}
+
 // returns the list of all user posts
 func UserPosts() ([]*Post, error) {
 	ctx, db := backend.Connect()
