@@ -137,3 +137,42 @@ func CreatePosts(userPost, email string) (*Post, error) {
 	// check list all the errs
 	return tempPost, nil
 }
+
+func ReplyToPost(parentPID int, postBody, email string) (*Post, error) {
+	ctx, db := backend.Connect()
+	defer db.Close()
+
+	// need get user id of the poster
+	uid, uidErr := accts.UserIDByEmail(email)
+
+	if uidErr != nil {
+		if errors.Is(uidErr, pgx.ErrNoRows) {
+			return nil, errors.New("error: resource not found: id with specified email couldn't be found")
+		}
+		return nil, fmt.Errorf("error: %w", uidErr)
+	}
+
+	// get the  user's  username
+	username, userNameErr := UsernameByID(uid)
+	if userNameErr != nil {
+		return nil, fmt.Errorf("error: %v\n", userNameErr)
+	}
+
+	var tempPost = new(Post)
+	err := db.QueryRow(ctx,
+		`INSERT INTO posts(parent_id, user_id, username, content)`+
+			` VALUES($1,$2,$3,$4) RETURNING *`, parentPID, uid, username, postBody).Scan(
+		&tempPost.ID, &tempPost.ParentID, &tempPost.UserID, &tempPost.Username,
+		&tempPost.Content, &tempPost.CreatedOn,
+	)
+
+	if err != nil {
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) {
+			return nil, fmt.Errorf("error: %s", pgErr.Message)
+		}
+	}
+
+	// check list all the errs
+	return tempPost, nil
+}

@@ -273,6 +273,35 @@ func viewResponsePage(c echo.Context) error {
 	})
 }
 
+func submitResponse(c echo.Context) error {
+	strID := c.Param("id")
+	postID, convErr := strconv.Atoi(strID)
+	if convErr != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, convErr)
+	}
+
+	userReply := c.FormValue("reply")
+	token, cookieErr := c.Cookie("auth")
+	if cookieErr != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, cookieErr)
+	}
+
+	claims, retrievalErr := sessionmanager.GetUserCustomClaims(token.Value, []byte(os.Getenv("HMAC_SECRET")))
+
+	if retrievalErr != nil {
+		return retrievalErr
+	}
+
+	_, err := posts.ReplyToPost(postID, userReply, claims.Email)
+
+	// handle errs where creating a post fails
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err)
+	}
+
+	return c.Redirect(http.StatusSeeOther, "/posts")
+}
+
 func addPosts(c echo.Context) error {
 	myPost := c.FormValue("content")
 
@@ -321,6 +350,7 @@ func main() {
 	router.POST("/posts", addPosts)
 	router.POST("/posts/:id", deletePosts)
 	router.GET("/posts/:id/reply", viewResponsePage)
+	router.POST("/posts/:id/reply", submitResponse)
 
 	r := router.Group("/restricted")
 
