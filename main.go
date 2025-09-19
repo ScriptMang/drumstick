@@ -74,13 +74,7 @@ func accountCreation(c echo.Context) error {
 	c.SetCookie(ck)
 	c.Request().AddCookie(ck)
 
-	// fmt.Println(resp)
-	uid, uidErr := accts.UserIDByEmail(newAcct.Email)
-	if uidErr != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, err)
-	}
-
-	userPosts, qryErr := posts.UserPostsByUserID(uid)
+	userPosts, qryErr := posts.UserPosts()
 	if qryErr != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, qryErr)
 	}
@@ -177,7 +171,7 @@ func viewFeed(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, qryErr)
 	}
 
-	userPosts, qryErr := posts.UserPostsByUserID(uid)
+	userPosts, qryErr := posts.UserPosts()
 	if qryErr != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, qryErr)
 	}

@@ -52,6 +52,24 @@ func UserPostsByUserID(uid int) ([]*Post, error) {
 	return userPosts, nil
 }
 
+// returns the list of all user posts
+func UserPosts() ([]*Post, error) {
+	ctx, db := backend.Connect()
+	defer db.Close()
+
+	var userPosts []*Post
+	err := pgxscan.Select(ctx, db, &userPosts, `Select * FROM posts`)
+	if err != nil {
+		return nil, fmt.Errorf("error: %w", err)
+	}
+
+	for _, pst := range userPosts {
+		pst.Date = pst.CreatedOn.Format("01/02/2006")
+	}
+
+	return userPosts, nil
+}
+
 // deletes the user's post given their post id
 // returns the new list of posts
 func DeletePostByID(postID int) error {
