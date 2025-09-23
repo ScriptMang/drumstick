@@ -34,3 +34,12 @@
 .bottom-separator {
     margin-top: 4rem;
 }
+
+.replies {
+    margin-left: 20px;
+    padding-left: 10px;
+    border-left: 2px solid #ddd;
+}
+.replies .posts {
+  margin-top: 1rem;
+}
