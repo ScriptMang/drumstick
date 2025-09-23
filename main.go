@@ -176,9 +176,10 @@ func viewFeed(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, qryErr)
 	}
 
+	topLevelPosts := posts.MakePostsTree(userPosts)
 	return c.Render(http.StatusOK, "posts", map[string]any{
 		"Username": username,
-		"Posts":    userPosts,
+		"Posts":    topLevelPosts,
 	})
 }
 

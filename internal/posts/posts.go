@@ -19,6 +19,7 @@ type Post struct {
 	Username  string    `json:"username" form:"username"`
 	Content   string    `json:"content" form:"content"`
 	CreatedOn time.Time `json:"created_on"`
+	Replies   []*Post
 	Date      string
 }
 
@@ -98,6 +99,27 @@ func DeletePostByID(postID int) error {
 	}
 
 	return nil
+}
+
+func MakePostsTree(posts []*Post) []*Post {
+	postsIndex := make(map[int]*Post)
+	var topLevelPosts []*Post
+
+	for _, p := range posts {
+		postsIndex[p.ID] = p
+	}
+
+	for _, p := range posts {
+		if p.ParentID == 0 {
+			topLevelPosts = append(topLevelPosts, p)
+		} else {
+			parent := postsIndex[p.ParentID]
+			if parent != nil {
+				parent.Replies = append(parent.Replies, p)
+			}
+		}
+	}
+	return topLevelPosts
 }
 
 func CreatePosts(userPost, email string) (*Post, error) {
