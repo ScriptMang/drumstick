@@ -13,7 +13,7 @@
 .posts-body {
     display: block;
     padding: 0;
-    margin-left: 1rem;
+    margin-left: 0;
 }
 
 .posts-item {
@@ -36,10 +36,15 @@
 }
 
 .replies {
-    margin-left: 20px;
-    padding-left: 10px;
-    border-left: 2px solid #ddd;
+    margin-left: 2rem;
+    border-left: 2px solid #ccc;
+    padding-left: 1rem;
 }
 .replies .posts {
+  margin-left: 1rem;
   margin-top: 1rem;
+}
+
+.replies .posts-body {
+    margin-left: 2rem;
 }
