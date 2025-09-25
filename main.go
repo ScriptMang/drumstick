@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"html/template"
 	"log"
 	"net/http"
@@ -18,6 +19,12 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
+
+type PostData struct {
+	Username   string
+	Posts      []*posts.Post
+	CurrUserID int
+}
 
 func signUp(c echo.Context) error {
 	data := "Register a New User"
@@ -185,12 +192,11 @@ func viewFeed(c echo.Context) error {
 	if qryErr != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, qryErr)
 	}
-
 	topLevelPosts := posts.MakePostsTree(userPosts)
-	return c.Render(http.StatusOK, "posts", map[string]any{
-		"Username": username,
-		"Posts":    topLevelPosts,
-	})
+
+	templateData := PostData{Username: username, Posts: topLevelPosts, CurrUserID: claims.UserID}
+
+	return c.Render(http.StatusOK, "posts", templateData)
 }
 
 // this funct is only  for testing purpsos
@@ -367,9 +373,27 @@ func addPosts(c echo.Context) error {
 	return c.Redirect(http.StatusSeeOther, "/posts")
 }
 
+func dict(vals ...any) (map[string]any, error) {
+	if len(vals)%2 != 0 {
+		return nil, fmt.Errorf("dictionary requires an even number of arguments")
+	}
+
+	m := make(map[string]any, len(vals)/2)
+	for i := 0; i < len(vals); i += 2 {
+		ky, ok := vals[i].(string)
+		if !ok {
+			return nil, fmt.Errorf("dictionary keys must be string type")
+		}
+		m[ky] = vals[i+1]
+	}
+	return m, nil
+}
+
 func main() {
 	tm := &templateRenderer.TemplateManager{
-		Templates: template.Must(template.ParseGlob("ui/html/pages/*[^#?!|].tmpl")),
+		Templates: template.Must(template.New("").Funcs(template.FuncMap{
+			"dict": dict,
+		}).ParseGlob("ui/html/pages/*[^#?!|].tmpl")),
 	}
 
 	router := echo.New()

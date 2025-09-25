@@ -1,33 +1,35 @@
 {{define "post"}}
   <div class="posts">
-
+  {{$top := .TopData }}
     <div class="posts-row">
       <div class="posts-item">
-        <p><strong>{{.Username}}</strong></p>
+        <p><strong>{{.Post.Username}}</strong></p>
       </div>
 
         <div class="posts-item">
-          <p><strong>{{.Date}}</strong></p>
+          <p><strong>{{.Post.Date}}</strong></p>
         </div>
      </div>
 
       <div class="posts-body">
-        <p>{{.Content}}</p>
+        <p>{{.Post.Content}}</p>
       </div>
 
       <div class="meta-item">
-        <form action="/posts/{{.ID}}" method="post" style="display:inline;">
+      {{if eq .Post.UserID $top.CurrUserID}}
+        <form action="/posts/{{.Post.ID}}" method="post" style="display:inline;">
          <input type="hidden" name="_method" value="DELETE">
           <button type="submit" class="delete-bttn">delete</button>
         </form>
-        <a href="/posts/{{.ID}}/reply"><button type="button">Reply</button></a>
+        {{end}}
+        <a href="/posts/{{.Post.ID}}/reply"><button type="button">Reply</button></a>
       </div>
 
-   {{if .Replies}}
+   {{if .Post.Replies}}
    <div class="replies">
       <hr>
-      {{range .Replies}}
-        {{template "post" .}}
+      {{range .Post.Replies}}
+        {{template "post" dict "Post" . "TopData" $top}}
       {{end}} 
    </div>
    {{end}}
