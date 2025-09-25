@@ -53,6 +53,20 @@ func UserPostsByUserID(uid int) ([]*Post, error) {
 	return userPosts, nil
 }
 
+func UserIDByPostID(pid int) (int, error) {
+	ctx, db := backend.Connect()
+	defer db.Close()
+
+	var userID int
+	err := db.QueryRow(ctx,
+		`SELECT user_id FROM POSTS WHERE id=$1`, pid).Scan(&userID)
+
+	if err != nil {
+		return 0, fmt.Errorf("error: %w", err)
+	}
+	return userID, nil
+}
+
 func UserPostByID(postID int) (Post, error) {
 	ctx, db := backend.Connect()
 	defer db.Close()

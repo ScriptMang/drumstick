@@ -10,6 +10,7 @@ import (
 )
 
 type UserCustomClaims struct {
+	UserID     int    `json: user_id`
 	Email      string `json:"email"`
 	IsLoggedIn bool   `json:"isloggedin"`
 	jwt.RegisteredClaims
@@ -54,10 +55,11 @@ func GetEmail(c echo.Context) (string, error) {
 }
 
 // adds user token to sessions table in database
-func CreateToken(usr string, c echo.Context) (*jwt.Token, error) {
+func CreateToken(userID int, usrEmail string, c echo.Context) (*jwt.Token, error) {
 	expirDate := time.Now().Add(time.Hour * 72).Unix()
 	claims := &UserCustomClaims{
-		Email:      usr,
+		UserID:     userID,
+		Email:      usrEmail,
 		IsLoggedIn: true,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Unix(expirDate, 0)),

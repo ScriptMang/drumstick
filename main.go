@@ -46,8 +46,13 @@ func accountCreation(c echo.Context) error {
 		return err
 	}
 
+	uid, err := accts.UserIDByEmail(newAcct.Email)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err)
+	}
+
 	//  acct is created -> create a token
-	tk, err := sessionmanager.CreateToken(newAcct.Email, c)
+	tk, err := sessionmanager.CreateToken(uid, newAcct.Email, c)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err)
 	}
@@ -103,7 +108,12 @@ func vetLogin(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusUnauthorized, rsltErr)
 	}
 
-	tk, err := sessionmanager.CreateToken(usr, c)
+	uid, err := accts.UserIDByEmail(usr)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err)
+	}
+
+	tk, err := sessionmanager.CreateToken(uid, usr, c)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err)
 	}
@@ -217,10 +227,44 @@ func restricted(c echo.Context) error {
 
 func deletePosts(c echo.Context) error {
 
+	t, err := c.Cookie("auth")
+	if err != nil {
+		return c.HTML(http.StatusUnauthorized,
+			"No authorization token",
+		)
+	}
+
+	claims, err := sessionmanager.GetUserCustomClaims(t.Value, []byte(os.Getenv("HMAC_SECRET")))
+	if errors.Is(err, jwt.ErrTokenExpired) {
+		return errors.New("token error: token Expired")
+	}
+
+	if errors.Is(err, jwt.ErrSignatureInvalid) {
+		return errors.New("token error: token has an invalid signature")
+	}
+
+	if errors.Is(err, jwt.ErrTokenRequiredClaimMissing) {
+		return errors.New("token error: token is missing required claims")
+	}
+
+	if errors.Is(err, jwt.ErrTokenSignatureInvalid) {
+		return errors.New("token error: token signature is invalid")
+	}
+
 	strPostID := c.Param("id")
 	postID, convErr := strconv.Atoi(strPostID)
 	if convErr != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, convErr)
+	}
+
+	postUserID, err := posts.UserIDByPostID(postID)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err)
+	}
+	currSessionUserID := claims.UserID
+	if currSessionUserID != postUserID {
+		return echo.NewHTTPError(http.StatusForbidden,
+			"the post your trying to delete doesn't belong to your current session")
 	}
 
 	deleteQueryErr := posts.DeletePostByID(postID)
@@ -257,10 +301,6 @@ func viewResponsePage(c echo.Context) error {
 	postID, convErr := strconv.Atoi(strID)
 	if convErr != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, convErr)
-	}
-
-	if qryErr != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, qryErr)
 	}
 
 	parentPost, err := posts.UserPostByID(postID)
