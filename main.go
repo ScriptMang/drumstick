@@ -413,7 +413,7 @@ func main() {
 
 	router.GET("/posts", viewFeed)
 	router.POST("/posts", addPosts)
-	router.POST("/posts/:id", deletePosts)
+	router.POST("/posts/:id/delete", deletePosts)
 	router.GET("/posts/:id/reply", viewResponsePage)
 	router.POST("/posts/:id/reply", submitResponse)
 

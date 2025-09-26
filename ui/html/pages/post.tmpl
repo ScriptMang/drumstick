@@ -17,7 +17,7 @@
 
       <div class="meta-item">
       {{if eq .Post.UserID $top.CurrUserID}}
-        <form action="/posts/{{.Post.ID}}" method="post" style="display:inline;">
+        <form action="/posts/{{.Post.ID}}/delete" method="post" style="display:inline;">
          <input type="hidden" name="_method" value="DELETE">
           <button type="submit" class="delete-bttn">delete</button>
         </form>
