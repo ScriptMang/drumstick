@@ -17,36 +17,24 @@
 
 ### Programs to be installed
 
-- This program requires the go programming language,
-  PostgreSQL and a terminal to be installed on your local machine.
-  This program is meant to run on MacOS and Windows.
+- This program requires a terminal with the go programming language, PostgreSQL, and 
+  the homebrew pkg mananager on your local machine. This program was built using macos.
  
 
 ### Setup
 
 - included in the project is a makefile which will setup the project for you.
   
-#### MacOS
-
 - Simply run `make macos-setup`and  it will install the hombrew pkg manager. 
   Then, it will install go, and postgresql using homebrew. After Postgresql is installed,
   it'll create the database drumstick and import the sql dump file included in the project.
 
 
-#### Windows
-- wip
-
 ### Starting Postgresql
 
-#### Macos
 - Open the terminal and start the postgresql server with `brew services start postgresql`
   Then write `psql drumstick` to view the database.
   
-#### Windows
-
-- Open the services.msc application, look for postgreSQL and make sure its on. 
-  if its not, select to turn it on. Afterwards, in cmd.exe write `psql drumstick`
-  to view the database.
   
 ### Running the application
 
