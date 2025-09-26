@@ -8,10 +8,9 @@
 - [x] Users can login
 - [x] Jwt auth is implemented
 - [x] Users can create posts
-- [ ] Users can reply to each other's posts
+- [x] Users can reply to each other's posts
 - [x] Users can delete their posts.
-- [ ] Users can edit their posts.
-- [ ] Secure all user post routes with JWT auth.
+- [x] Secure all user post routes with JWT auth.
 
 ## Prior to Running
 
@@ -65,19 +64,22 @@ If successful it redirects to the user's post page, other it errors.
 
 ### Posts
 
+#### Posts Page
+
 After login, the user will have access to their Posts page which is their homepage.
 The route is located at ` GET localhost:8080/posts`. The Posts page is the where the users 
-can view and submit posts. New posts are submitted via `POST localhost:8080`.
-Each Post contains the user's username, the date the post was submitted, and 
-the post's body. The max size of the post's body is 350 characters. 
+can view, submit, and delete or reply to posts. Each Post contains the user's username, 
+the date the post was submitted, and  the post's body.
+The max size of the post's body is 350 characters. 
 
-Users can also delete their posts by clicking the delete button on any post
-or at `POST localhost:8080/posts/:id`.
+#### Replying to Posts
+
+If a user clicks on the reply button for a another user's post they'll be sent to the reply page
+`GET localhost:8080/posts/:id/reply`. In the reply page the post in question is shown above
+while you create your reply in the textbox below. Once your done you click the submit button
+which sends a `POST localhost:8080/posts/:id/reply`.
 
 
-#### Current Progress
-
-Currently the user can only create new posts to themselves an delete them.
-Users cannot reply to each other users. Posts also, can't be edited.
-Being able to make replies and edit your posts are wips.
-
+#### Deleting Posts
+Users can also delete their posts by clicking the delete button which sends
+a `POST localhost:8080/posts/:id/delete`.
