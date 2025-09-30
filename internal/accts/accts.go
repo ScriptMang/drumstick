@@ -95,15 +95,8 @@ func vetEmailAddress(email string) []error {
 
 	reqSymbols := "@"
 	endingAddrs := []string{".com", ".org", ".net"}
-	reqNums := "0123456789"
-	errReqNums := errors.New("email requires numbers.")
 	errReqSymbol := errors.New("email is missing an '@' symbol.")
 	errReqEndingAddr := errors.New("email doesn't match any of the ending addresses.")
-
-	// the email must have contain a number
-	if !strings.ContainsAny(email, reqNums) {
-		tmpErrs = append(tmpErrs, fmt.Errorf("error:email:%w", errReqNums))
-	}
 
 	// the  email must have an @ symbol
 	if !strings.ContainsAny(email, reqSymbols) {
