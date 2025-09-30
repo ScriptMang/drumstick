@@ -86,14 +86,7 @@ func accountCreation(c echo.Context) error {
 	c.SetCookie(ck)
 	c.Request().AddCookie(ck)
 
-	userPosts, qryErr := posts.UserPosts()
-	if qryErr != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, qryErr)
-	}
-
-	return c.Render(http.StatusOK, "posts", map[string]any{
-		"Posts": userPosts,
-	})
+	return c.Redirect(http.StatusSeeOther, "/posts")
 }
 
 func homePage(c echo.Context) error {
