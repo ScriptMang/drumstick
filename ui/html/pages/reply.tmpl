@@ -18,11 +18,12 @@
 </div>
 <hr>
 
-<form action="/posts/{{.ParentPost.ID}}/reply" method="POST">
+<form action="/posts/{{.ParentPost.ID}}/reply" method="POST" style="display:inline;">
  <label for="reply">Your Response</label>
  <textarea id="reply" name="reply" rows="6" cols="60"></textarea><br><br>
  <button type="submit">Submit Reply</button>
 </form>
-  </body>
+<a href="/posts" style="display:inline;"><button type="button">cancel</button></a>
+ </body>
 </html>
 {{end}}
