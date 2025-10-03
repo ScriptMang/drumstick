@@ -2,14 +2,15 @@
 -- PostgreSQL database dump
 --
 
-\restrict sv748ZPrec1z8g5Rdh4PyopMytExPhyQB6eMvqFOZkFhFdAtMg7iZvsx5APgSX3
+\restrict ZBam8U7otBxiItyqVJKzDiLEVS6ZrMf79luIRqDIt1WuwpyJ5UmIXsh6GNo5lCa
 
--- Dumped from database version 16.10 (Homebrew)
--- Dumped by pg_dump version 16.10 (Homebrew)
+-- Dumped from database version 17.6 (Homebrew)
+-- Dumped by pg_dump version 17.6 (Homebrew)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
+SET transaction_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SELECT pg_catalog.set_config('search_path', '', false);
@@ -301,5 +302,5 @@ ALTER TABLE ONLY public.user_profile
 -- PostgreSQL database dump complete
 --
 
-\unrestrict sv748ZPrec1z8g5Rdh4PyopMytExPhyQB6eMvqFOZkFhFdAtMg7iZvsx5APgSX3
+\unrestrict ZBam8U7otBxiItyqVJKzDiLEVS6ZrMf79luIRqDIt1WuwpyJ5UmIXsh6GNo5lCa
 
