@@ -97,29 +97,29 @@ func Test_accountcreation(t *testing.T) {
 	missingCapitalLetter := errors.New("field is missing at least 1 capital letter")
 
 	tests := []struct {
-		testName                     string
-		attribNames                  []string
-		fname, lname, address, email string
-		password                     []byte
-		errLst                       []error
+		testName                               string
+		attribNames                            []string
+		fname, lname, username, address, email string
+		password                               []byte
+		errLst                                 []error
 	}{
-		{"Empty Attributes", []string{"fname", "lname"}, "", "", "409 Alistar Road", "dummy59@gmail.com", []byte("passwordPomp432"), []error{errEmptyField, errEmptyField}},
-		{"No Spaces Found in Fname", []string{"fname"}, " Jon", "Martin", "409 Alistar Road", "dummy59@gmail.com", []byte("passwordPomp432"), []error{errHasPunct}},
-		{"No Spaces Found in Lname", []string{"lname"}, "Jon", " Martin", "409 Alistar Road", "dummy59@gmail.com", []byte("passwordPomp432"), []error{errHasPunct}},
-		{"No Spaces Found in Fname and Lname", []string{"fname", "lname"}, " Jon", " Martin", "409 Alistar Road", "dummy59@gmail.com", []byte("passwordPomp432"), []error{errHasPunct, errHasPunct}},
-		{"No Symbols in Fname", []string{"fname"}, "Jon@", "Martin", "409 Alistar Road", "dummy59@gmail.com", []byte("passwordPomp432"), []error{errHasSymbols}},
-		{"No Symbols in Lname", []string{"lname"}, "Jon", "@Martin", "409 Alistar Road", "dummy59@gmail.com", []byte("passwordPomp432"), []error{errHasSymbols}},
-		{"No Numbers in Fname", []string{"fname"}, "Jon3", "Martin", "409 Alistar Road", "dummy59@gmail.com", []byte("passwordPomp432"), []error{errHasNums}},
-		{"No Numbers in Lname", []string{"lname"}, "Jon", "Martin5", "409 Alistar Road", "dummy59@gmail.com", []byte("passwordPomp432"), []error{errHasNums}},
-		{"No Symbols in Address", []string{"address"}, "Jon", "Martin", "@409 Alistar Road", "dummy59@gmail.com", []byte("passwordPomp432"), []error{errHasSymbols}},
-		{"Missing '@' Symbol in Email", []string{"email"}, "Jon", "Martin", "409 Alistar Road", "dummy59gmail.com", []byte("passwordPomp432"), []error{errReqSymbol}},
-		{"Missing digits in Email", []string{"email", "email"}, "Jon", "Martin", "409 Alistar Road", "dummy@gmail.com", []byte("passwordPomp432"), []error{errReqNums}},
-		{"Missing digits and Invalid ending address in Email", []string{"email", "email"}, "Jon", "Martin", "409 Alistar Road", "dummy@gmail.dum", []byte("passwordPomp432"), []error{errReqNums, errReqEndingAddr}},
-		{"Missing at least One Capital Letter in Password", []string{"password"}, "Jon", "Martin", "409 Alistar Road", "dummy59@gmail.com", []byte("passwordpomp432"), []error{missingCapitalLetter}},
-		{"Password is empty", []string{"password"}, "Jon", "Martin", "409 Alistar Road", "dummy59@gmail.com", []byte(""), []error{emptyPswd}},
-		{"Password is too short", []string{"password", "password", "password"}, "Jon", "Martin", "409 Alistar Road", "dummy59@gmail.com", []byte("prompt"), []error{shortPswd, missingCapitalLetter, pswdHasNoDigits}},
-		{"Password is too long", []string{"password"}, "Jon", "Martin", "409 Alistar Road", "dummy59@gmail.com", []byte("passwordPomp43233"), []error{longPswd}},
-		{"Password has no digits", []string{"password", "password", "password"}, "Jon", "Martin", "409 Alistar Road", "dummy59@gmail.com", []byte("passwordpomppppp"), []error{longPswd, missingCapitalLetter, pswdHasNoDigits}}, {"Password has symbols", []string{"password"}, "Jon", "Martin", "409 Alistar Road", "dummy59@gmail.com", []byte("passwordPomp43!"), []error{pswdHasSymbols}},
+		{"Empty Attributes", []string{"fname", "lname"}, "", "", "testUser1", "409 Alistar Road", "dummy59@gmail.com", []byte("passwordPomp432"), []error{errEmptyField, errEmptyField}},
+		{"No Spaces Found in Fname", []string{"fname"}, " Jon", "Martin", "testUser2", "409 Alistar Road", "dummy59@gmail.com", []byte("passwordPomp432"), []error{errHasPunct}},
+		{"No Spaces Found in Lname", []string{"lname"}, "Jon", " Martin", "testUser3", "409 Alistar Road", "dummy59@gmail.com", []byte("passwordPomp432"), []error{errHasPunct}},
+		{"No Spaces Found in Fname and Lname", []string{"fname", "lname"}, " Jon", " Martin", "testUser4", "409 Alistar Road", "dummy59@gmail.com", []byte("passwordPomp432"), []error{errHasPunct, errHasPunct}},
+		{"No Symbols in Fname", []string{"fname"}, "Jon@", "Martin", "testUser5", "409 Alistar Road", "dummy59@gmail.com", []byte("passwordPomp432"), []error{errHasSymbols}},
+		{"No Symbols in Lname", []string{"lname"}, "Jon", "@Martin", "testUser6", "409 Alistar Road", "dummy59@gmail.com", []byte("passwordPomp432"), []error{errHasSymbols}},
+		{"No Numbers in Fname", []string{"fname"}, "Jon3", "Martin", "testUser7", "409 Alistar Road", "dummy59@gmail.com", []byte("passwordPomp432"), []error{errHasNums}},
+		{"No Numbers in Lname", []string{"lname"}, "Jon", "Martin5", "testUser8", "409 Alistar Road", "dummy59@gmail.com", []byte("passwordPomp432"), []error{errHasNums}},
+		{"No Symbols in Address", []string{"address"}, "Jon", "Martin", "testUser9", "@409 Alistar Road", "dummy59@gmail.com", []byte("passwordPomp432"), []error{errHasSymbols}},
+		{"Missing '@' Symbol in Email", []string{"email"}, "Jon", "Martin", "testUser10", "409 Alistar Road", "dummy59gmail.com", []byte("passwordPomp432"), []error{errReqSymbol}},
+		{"Missing digits in Email", []string{"email", "email"}, "Jon", "Martin", "testUser11", "409 Alistar Road", "dummy@gmail.com", []byte("passwordPomp432"), []error{errReqNums}},
+		{"Missing digits and Invalid ending address in Email", []string{"email", "email"}, "Jon", "Martin", "testUser12", "409 Alistar Road", "dummy@gmail.dum", []byte("passwordPomp432"), []error{errReqNums, errReqEndingAddr}},
+		{"Missing at least One Capital Letter in Password", []string{"password"}, "Jon", "Martin", "testUser13", "409 Alistar Road", "dummy59@gmail.com", []byte("passwordpomp432"), []error{missingCapitalLetter}},
+		{"Password is empty", []string{"password"}, "Jon", "Martin", "testUser14", "409 Alistar Road", "dummy59@gmail.com", []byte(""), []error{emptyPswd}},
+		{"Password is too short", []string{"password", "password", "password"}, "Jon", "Martin", "testUser15", "409 Alistar Road", "dummy59@gmail.com", []byte("prompt"), []error{shortPswd, missingCapitalLetter, pswdHasNoDigits}},
+		{"Password is too long", []string{"password"}, "Jon", "Martin", "testUser16", "409 Alistar Road", "dummy59@gmail.com", []byte("passwordPomp43233"), []error{longPswd}},
+		{"Password has no digits", []string{"password", "password", "password"}, "Jon", "Martin", "testUser17", "409 Alistar Road", "dummy59@gmail.com", []byte("passwordpomppppp"), []error{longPswd, missingCapitalLetter, pswdHasNoDigits}}, {"Password has symbols", []string{"password"}, "Jon", "Martin", "testUser18", "409 Alistar Road", "dummy59@gmail.com", []byte("passwordPomp43!"), []error{pswdHasSymbols}},
 	}
 
 	// range over table tests and validate the right errs are being thrown
@@ -129,7 +129,7 @@ func Test_accountcreation(t *testing.T) {
 		c := r.NewContext(req, w)
 		c.SetPath("/posts")
 		t.Run(tt.testName, func(t *testing.T) {
-			tempAcct := Account{Fname: tt.fname, Lname: tt.lname, Address: tt.address, Email: tt.email, Password: tt.password}
+			tempAcct := Account{Fname: tt.fname, Lname: tt.lname, Username: tt.username, Address: tt.address, Email: tt.email, Password: tt.password}
 			actualErrLst := VetAllFields(tempAcct)
 			expectedErrLst := printAcctErrs(tt.attribNames, tt.errLst)
 			assert.Equal(t, expectedErrLst, actualErrLst, expectedErrLst)
