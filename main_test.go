@@ -27,7 +27,9 @@ func TestMain(m *testing.M) {
 
 func setupEchoClient() *echo.Echo {
 	tm := &templateRenderer.TemplateManager{
-		Templates: template.Must(template.ParseGlob("ui/html/pages/*[^#?!|].tmpl")),
+		Templates: template.Must(template.New("").Funcs(template.FuncMap{
+			"dict": dict,
+		}).ParseGlob("ui/html/pages/*[^#?!|].tmpl")),
 	}
 
 	r := echo.New()
