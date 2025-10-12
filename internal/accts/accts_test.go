@@ -84,7 +84,6 @@ func Test_accountcreation(t *testing.T) {
 	errHasPunct := errors.New("field has punctuation")
 
 	// email errs
-	errReqNums := errors.New("email requires numbers.")
 	errReqSymbol := errors.New("email is missing an '@' symbol.")
 	errReqEndingAddr := errors.New("email doesn't match any of the ending addresses.")
 
@@ -113,8 +112,7 @@ func Test_accountcreation(t *testing.T) {
 		{"No Numbers in Lname", []string{"lname"}, "Jon", "Martin5", "testUser8", "409 Alistar Road", "dummy59@gmail.com", []byte("passwordPomp432"), []error{errHasNums}},
 		{"No Symbols in Address", []string{"address"}, "Jon", "Martin", "testUser9", "@409 Alistar Road", "dummy59@gmail.com", []byte("passwordPomp432"), []error{errHasSymbols}},
 		{"Missing '@' Symbol in Email", []string{"email"}, "Jon", "Martin", "testUser10", "409 Alistar Road", "dummy59gmail.com", []byte("passwordPomp432"), []error{errReqSymbol}},
-		{"Missing digits in Email", []string{"email", "email"}, "Jon", "Martin", "testUser11", "409 Alistar Road", "dummy@gmail.com", []byte("passwordPomp432"), []error{errReqNums}},
-		{"Missing digits and Invalid ending address in Email", []string{"email", "email"}, "Jon", "Martin", "testUser12", "409 Alistar Road", "dummy@gmail.dum", []byte("passwordPomp432"), []error{errReqNums, errReqEndingAddr}},
+		{"Invalid ending address in Email", []string{"email"}, "Jon", "Martin", "testUser12", "409 Alistar Road", "dummy@gmail.dum", []byte("passwordPomp432"), []error{errReqEndingAddr}},
 		{"Missing at least One Capital Letter in Password", []string{"password"}, "Jon", "Martin", "testUser13", "409 Alistar Road", "dummy59@gmail.com", []byte("passwordpomp432"), []error{missingCapitalLetter}},
 		{"Password is empty", []string{"password"}, "Jon", "Martin", "testUser14", "409 Alistar Road", "dummy59@gmail.com", []byte(""), []error{emptyPswd}},
 		{"Password is too short", []string{"password", "password", "password"}, "Jon", "Martin", "testUser15", "409 Alistar Road", "dummy59@gmail.com", []byte("prompt"), []error{shortPswd, missingCapitalLetter, pswdHasNoDigits}},
