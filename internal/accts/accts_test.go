@@ -116,8 +116,8 @@ func Test_accountcreation(t *testing.T) {
 		{"Missing at least One Capital Letter in Password", []string{"password"}, "Jon", "Martin", "testUser13", "409 Alistar Road", "dummy59@gmail.com", []byte("passwordpomp432"), []error{missingCapitalLetter}},
 		{"Password is empty", []string{"password"}, "Jon", "Martin", "testUser14", "409 Alistar Road", "dummy59@gmail.com", []byte(""), []error{emptyPswd}},
 		{"Password is too short", []string{"password", "password", "password"}, "Jon", "Martin", "testUser15", "409 Alistar Road", "dummy59@gmail.com", []byte("prompt"), []error{shortPswd, missingCapitalLetter, pswdHasNoDigits}},
-		{"Password is too long", []string{"password"}, "Jon", "Martin", "testUser16", "409 Alistar Road", "dummy59@gmail.com", []byte("passwordPomp43233"), []error{longPswd}},
-		{"Password has no digits", []string{"password", "password", "password"}, "Jon", "Martin", "testUser17", "409 Alistar Road", "dummy59@gmail.com", []byte("passwordpomppppp"), []error{longPswd, missingCapitalLetter, pswdHasNoDigits}}, {"Password has symbols", []string{"password"}, "Jon", "Martin", "testUser18", "409 Alistar Road", "dummy59@gmail.com", []byte("passwordPomp43!"), []error{pswdHasSymbols}},
+		{"Password is too long", []string{"password"}, "Jon", "Martin", "testUser16", "409 Alistar Road", "dummy59@gmail.com", []byte("passwordPomp4323349484734743743233"), []error{longPswd}},
+		{"Password has no digits", []string{"password", "password", "password"}, "Jon", "Martin", "testUser17", "409 Alistar Road", "dummy59@gmail.com", []byte("passwordpomppppp"), []error{missingCapitalLetter, pswdHasNoDigits}}, {"Password has symbols", []string{"password"}, "Jon", "Martin", "testUser18", "409 Alistar Road", "dummy59@gmail.com", []byte("passwordPomp43!"), []error{pswdHasSymbols}},
 	}
 
 	// range over table tests and validate the right errs are being thrown
