@@ -2,8 +2,8 @@ package posts
 
 import (
 	"fmt"
+	"html/template"
 	"scriptmang/drumstick/internal/templateRenderer"
-	"text/template"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
