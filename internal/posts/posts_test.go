@@ -5,8 +5,8 @@ import (
 	"scriptmang/drumstick/internal/templateRenderer"
 	"text/template"
 
-	"github.com/labstack/echo"
-	"github.com/labstack/echo/middleware"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 )
 
 func dict(vals ...any) (map[string]any, error) {
