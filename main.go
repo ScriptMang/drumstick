@@ -183,7 +183,7 @@ func (s *Server) viewFeed(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, err)
 	}
 
-	username, qryErr := posts.UsernameByID(c.Request().Context, s.db, uid)
+	username, qryErr := posts.UsernameByID(c.Request().Context(), s.db, uid)
 	if qryErr != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, qryErr)
 	}
@@ -298,7 +298,7 @@ func (s *Server) viewResponsePage(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, err)
 	}
 
-	username, qryErr := posts.UsernameByID(c.Request().Context, s.db, uid)
+	username, qryErr := posts.UsernameByID(c.Request().Context(), s.db, uid)
 	if qryErr != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, qryErr)
 	}
