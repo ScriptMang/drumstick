@@ -24,14 +24,12 @@ type Post struct {
 	Date      string
 }
 
-func UsernameByID(id int) (string, error) {
-	ctx, db := backend.Connect()
-	defer db.Close()
 type Querier interface {
 	QueryRow(ctx context.Context, sql string, args ...any) pgx.Row
 	Exec(ctx context.Context, sql string, args ...any) (pgconn.CommandTag, error)
 }
 
+func UsernameByID(ctx context.Context, db Querier, id int) (string, error) {
 	var username string
 	err := db.QueryRow(ctx,
 		`Select username FROM user_account WHERE id=$1`, id).Scan(&username)

@@ -150,7 +150,7 @@ func vetLogin(c echo.Context) error {
 	return c.Redirect(http.StatusSeeOther, "/posts")
 }
 
-func viewFeed(c echo.Context) error {
+func (s *Server) viewFeed(c echo.Context) error {
 
 	t, err := c.Cookie("auth")
 	if err != nil {
@@ -183,7 +183,7 @@ func viewFeed(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, err)
 	}
 
-	username, qryErr := posts.UsernameByID(uid)
+	username, qryErr := posts.UsernameByID(c.Request().Context, s.db, uid)
 	if qryErr != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, qryErr)
 	}
@@ -414,7 +414,7 @@ func main() {
 	router.GET("/login", loginForm)
 	router.POST("/login", vetLogin)
 
-	router.GET("/posts", viewFeed)
+	router.GET("/posts", svr.viewFeed)
 	router.POST("/posts", addPosts)
 	router.POST("/posts/:id/delete", deletePosts)
 	router.GET("/posts/:id/reply", viewResponsePage)
