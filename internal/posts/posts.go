@@ -139,10 +139,7 @@ func MakePostsTree(posts []*Post) []*Post {
 	return topLevelPosts
 }
 
-func CreatePosts(userPost, email string) (*Post, error) {
-	ctx, db := backend.Connect()
-	defer db.Close()
-
+func CreatePosts(ctx context.Context, db Querier, userPost, email string) (*Post, error) {
 	// need get user id of the poster
 	uid, uidErr := accts.UserIDByEmail(email)
 
@@ -154,7 +151,7 @@ func CreatePosts(userPost, email string) (*Post, error) {
 	}
 
 	// get the  user's  username
-	username, userNameErr := UsernameByID(uid)
+	username, userNameErr := UsernameByID(ctx, db, uid)
 	if userNameErr != nil {
 		return nil, fmt.Errorf("error: %v\n", userNameErr)
 	}
@@ -177,9 +174,7 @@ func CreatePosts(userPost, email string) (*Post, error) {
 	return tempPost, nil
 }
 
-func ReplyToPost(parentPID int, postBody, email string) (*Post, error) {
-	ctx, db := backend.Connect()
-	defer db.Close()
+func ReplyToPost(ctx context.Context, db Querier, parentPID int, postBody, email string) (*Post, error) {
 
 	// need get user id of the poster
 	uid, uidErr := accts.UserIDByEmail(email)
@@ -192,7 +187,7 @@ func ReplyToPost(parentPID int, postBody, email string) (*Post, error) {
 	}
 
 	// get the  user's  username
-	username, userNameErr := UsernameByID(uid)
+	username, userNameErr := UsernameByID(ctx, db, uid)
 	if userNameErr != nil {
 		return nil, fmt.Errorf("error: %v\n", userNameErr)
 	}
