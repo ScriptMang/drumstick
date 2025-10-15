@@ -10,11 +10,13 @@ import (
 	"strconv"
 
 	"scriptmang/drumstick/internal/accts"
+	"scriptmang/drumstick/internal/backend"
 	"scriptmang/drumstick/internal/posts"
 	"scriptmang/drumstick/internal/sessionmanager"
 	"scriptmang/drumstick/internal/templateRenderer"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -24,6 +26,11 @@ type PostData struct {
 	Username   string
 	Posts      []*posts.Post
 	CurrUserID int
+}
+
+type Server struct {
+	db *pgxpool.Pool
+	e  echo.Echo
 }
 
 func signUp(c echo.Context) error {
@@ -389,7 +396,10 @@ func main() {
 		}).ParseGlob("ui/html/pages/*[^#?!|].tmpl")),
 	}
 
+	ctx, db := backend.Connect()
+	defer db.Close()
 	router := echo.New()
+	svr := &Server{db: db, e: router}
 
 	router.Use(middleware.SecureWithConfig(middleware.DefaultSecureConfig))
 	router.Use(middleware.Logger())
