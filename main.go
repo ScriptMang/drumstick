@@ -30,7 +30,7 @@ type PostData struct {
 
 type Server struct {
 	db *pgxpool.Pool
-	e  echo.Echo
+	e  *echo.Echo
 }
 
 func signUp(c echo.Context) error {
