@@ -396,7 +396,7 @@ func main() {
 		}).ParseGlob("ui/html/pages/*[^#?!|].tmpl")),
 	}
 
-	ctx, db := backend.Connect()
+	db := backend.Connect()
 	defer db.Close()
 	router := echo.New()
 	svr := &Server{db: db, e: router}

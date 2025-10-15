@@ -15,7 +15,7 @@ type Querier interface {
 	Exec(ctx context.Context, sql string, args ...any) (pgconn.CommandTag, error)
 }
 
-func Connect() (context.Context, *pgxpool.Pool) {
+func Connect() *pgxpool.Pool {
 	ctx := context.Background()
 	uri := "postgres://username@localhost:5432/drumstick"
 	os.Setenv("DATABASE_URL", uri)
@@ -26,5 +26,5 @@ func Connect() (context.Context, *pgxpool.Pool) {
 		os.Exit(1)
 	}
 
-	return ctx, conn
+	return conn
 }
