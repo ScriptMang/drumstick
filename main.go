@@ -320,7 +320,7 @@ func (s *Server) viewResponsePage(c echo.Context) error {
 	})
 }
 
-func submitResponse(c echo.Context) error {
+func (s *Server) submitResponse(c echo.Context) error {
 	strID := c.Param("id")
 	postID, convErr := strconv.Atoi(strID)
 	if convErr != nil {
@@ -339,7 +339,7 @@ func submitResponse(c echo.Context) error {
 		return retrievalErr
 	}
 
-	_, err := posts.ReplyToPost(postID, userReply, claims.Email)
+	_, err := posts.ReplyToPost(c.Request().Context(), s.db, postID, userReply, claims.Email)
 
 	// handle errs where creating a post fails
 	if err != nil {
@@ -349,7 +349,7 @@ func submitResponse(c echo.Context) error {
 	return c.Redirect(http.StatusSeeOther, "/posts")
 }
 
-func addPosts(c echo.Context) error {
+func (s *Server) addPosts(c echo.Context) error {
 	myPost := c.FormValue("content")
 
 	token, cookieErr := c.Cookie("auth")
@@ -363,7 +363,7 @@ func addPosts(c echo.Context) error {
 		return retrievalErr
 	}
 
-	_, err := posts.CreatePosts(myPost, claims.Email)
+	_, err := posts.CreatePosts(c.Request().Context(), s.db, myPost, claims.Email)
 
 	// handle errs where creating a post fails
 	if err != nil {
@@ -415,10 +415,10 @@ func main() {
 	router.POST("/login", vetLogin)
 
 	router.GET("/posts", svr.viewFeed)
-	router.POST("/posts", addPosts)
+	router.POST("/posts", svr.addPosts)
 	router.POST("/posts/:id/delete", deletePosts)
 	router.GET("/posts/:id/reply", svr.viewResponsePage)
-	router.POST("/posts/:id/reply", submitResponse)
+	router.POST("/posts/:id/reply", svr.submitResponse)
 
 	r := router.Group("/restricted")
 
