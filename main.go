@@ -38,7 +38,7 @@ func signUp(c echo.Context) error {
 	return c.Render(http.StatusOK, "signup", data)
 }
 
-func accountCreation(c echo.Context) error {
+func (s *Server) accountCreation(c echo.Context) error {
 	var newAcct accts.Account
 
 	newAcct.Fname = c.FormValue("fname")
@@ -54,13 +54,13 @@ func accountCreation(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, errors.Join(rsltErr...))
 	}
 
-	_, err := accts.CreateAcct(newAcct)
+	_, err := accts.CreateAcct(c.Request().Context(), s.db, newAcct)
 	if err != nil {
 		log.Println(err.Error())
 		return err
 	}
 
-	uid, err := accts.UserIDByEmail(newAcct.Email)
+	uid, err := accts.UserIDByEmail(c.Request().Context(), s.db, newAcct.Email)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err)
 	}
@@ -106,16 +106,16 @@ func loginForm(c echo.Context) error {
 	return c.Render(http.StatusOK, "loginForm", str)
 }
 
-func vetLogin(c echo.Context) error {
+func (s *Server) vetLogin(c echo.Context) error {
 	usr := c.FormValue("email")
 	pswd := c.FormValue("password")
 
-	rsltErr := accts.CompareUserCreds(usr, pswd)
+	rsltErr := accts.CompareUserCreds(c.Request().Context(), s.db, usr, pswd)
 	if rsltErr != nil {
 		return echo.NewHTTPError(http.StatusUnauthorized, rsltErr)
 	}
 
-	uid, err := accts.UserIDByEmail(usr)
+	uid, err := accts.UserIDByEmail(c.Request().Context(), s.db, usr)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err)
 	}
@@ -178,7 +178,7 @@ func (s *Server) viewFeed(c echo.Context) error {
 	}
 
 	email := claims.Email
-	uid, uidErr := accts.UserIDByEmail(email)
+	uid, uidErr := accts.UserIDByEmail(c.Request().Context(), s.db, email)
 	if uidErr != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err)
 	}
@@ -410,9 +410,9 @@ func main() {
 	router.Renderer = tm
 	router.GET("/", homePage)
 	router.GET("/signup", signUp)
-	router.POST("/view", accountCreation)
+	router.POST("/view", svr.accountCreation)
 	router.GET("/login", loginForm)
-	router.POST("/login", vetLogin)
+	router.POST("/login", svr.vetLogin)
 
 	router.GET("/posts", svr.viewFeed)
 	router.POST("/posts", svr.addPosts)

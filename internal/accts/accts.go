@@ -2,6 +2,7 @@ package accts
 
 import (
 	"bytes"
+	"context"
 	"errors"
 	"fmt"
 	"log"
@@ -193,10 +194,7 @@ func VetAllFields(acct Account) []error {
 }
 
 // returns a slice of all the emails in the database
-func readEmails() []string {
-	ctx, db := backend.Connect()
-	defer db.Close()
-
+func readEmails(ctx context.Context, db backend.Querier) []string {
 	var users []*UserAccount
 	err := pgxscan.Select(ctx, db, &users, `SELECT * FROM user_account`)
 	if errors.Is(err, pgx.ErrNoRows) {
@@ -219,9 +217,8 @@ func readEmails() []string {
 
 // compare the provided user email ,and password
 // hash to those that exist in the databse
-func CompareUserCreds(email string, pswd string) error {
-	lstEmails := readEmails()
-
+func CompareUserCreds(ctx context.Context, db backend.Querier, email string, pswd string) error {
+	lstEmails := readEmails(ctx, db)
 	emailIsReal := false
 	for _, target := range lstEmails {
 		if email == target {
@@ -238,10 +235,6 @@ func CompareUserCreds(email string, pswd string) error {
 
 	// need pswd hash from database
 	// compare to one in database
-
-	ctx, db := backend.Connect()
-	defer db.Close()
-
 	var users []*UserAccount
 	err := pgxscan.Select(ctx, db, &users, `Select * FROM user_account`)
 
@@ -273,10 +266,7 @@ func CompareUserCreds(email string, pswd string) error {
 }
 
 // add user account to the database
-func addUserAcct(acct *Account) error {
-	ctx, db := backend.Connect()
-	defer db.Close()
-
+func addUserAcct(ctx context.Context, db backend.Querier, acct *Account) error {
 	var err error
 	acct.Password, err = encryptPassword(acct.Password)
 	if err != nil {
@@ -317,10 +307,7 @@ func addUserAcct(acct *Account) error {
 }
 
 // get the user's id from their username
-func UserIDByEmail(email string) (int, error) {
-	ctx, db := backend.Connect()
-	defer db.Close()
-
+func UserIDByEmail(ctx context.Context, db backend.Querier, email string) (int, error) {
 	var user []*UserAccount
 	err := pgxscan.Select(ctx, db, &user, `SELECT id FROM user_account WHERE email = $1`, email)
 
@@ -341,10 +328,7 @@ func UserIDByEmail(email string) (int, error) {
 }
 
 // add user account to the database
-func addUserProfile(acct Account) error {
-	ctx, db := backend.Connect()
-	defer db.Close()
-
+func addUserProfile(ctx context.Context, db backend.Querier, acct Account) error {
 	_, err := db.Exec(ctx,
 		`INSERT INTO user_profile (user_id, fname, lname, address) VALUES($1,$2,$3,$4)`,
 		acct.ID, acct.Fname, acct.Lname, acct.Address,
@@ -362,19 +346,19 @@ func addUserProfile(acct Account) error {
 }
 
 // add a user account and profile to the database
-func CreateAcct(acct Account) (string, error) {
-	err := addUserAcct(&acct)
+func CreateAcct(ctx context.Context, db backend.Querier, acct Account) (string, error) {
+	err := addUserAcct(ctx, db, &acct)
 	if err != nil {
 		return "", fmt.Errorf("error: %w", err)
 	}
 
 	var userID int
-	userID, err = UserIDByEmail(acct.Email)
+	userID, err = UserIDByEmail(ctx, db, acct.Email)
 	if err != nil {
 		return "", fmt.Errorf("error: %w", err)
 	}
 
-	err = addUserProfile(acct)
+	err = addUserProfile(ctx, db, acct)
 	if err != nil {
 		return "", fmt.Errorf("error: %w", err)
 	}

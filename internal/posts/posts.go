@@ -136,7 +136,7 @@ func MakePostsTree(posts []*Post) []*Post {
 
 func CreatePosts(ctx context.Context, db backend.Querier, userPost, email string) (*Post, error) {
 	// need get user id of the poster
-	uid, uidErr := accts.UserIDByEmail(email)
+	uid, uidErr := accts.UserIDByEmail(ctx, db, email)
 
 	if uidErr != nil {
 		if errors.Is(uidErr, pgx.ErrNoRows) {
@@ -170,9 +170,8 @@ func CreatePosts(ctx context.Context, db backend.Querier, userPost, email string
 }
 
 func ReplyToPost(ctx context.Context, db backend.Querier, parentPID int, postBody, email string) (*Post, error) {
-
 	// need get user id of the poster
-	uid, uidErr := accts.UserIDByEmail(email)
+	uid, uidErr := accts.UserIDByEmail(ctx, db, email)
 
 	if uidErr != nil {
 		if errors.Is(uidErr, pgx.ErrNoRows) {
