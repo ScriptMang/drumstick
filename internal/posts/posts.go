@@ -24,12 +24,7 @@ type Post struct {
 	Date      string
 }
 
-type Querier interface {
-	QueryRow(ctx context.Context, sql string, args ...any) pgx.Row
-	Exec(ctx context.Context, sql string, args ...any) (pgconn.CommandTag, error)
-}
-
-func UsernameByID(ctx context.Context, db Querier, id int) (string, error) {
+func UsernameByID(ctx context.Context, db backend.Querier, id int) (string, error) {
 	var username string
 	err := db.QueryRow(ctx,
 		`Select username FROM user_account WHERE id=$1`, id).Scan(&username)
@@ -139,7 +134,7 @@ func MakePostsTree(posts []*Post) []*Post {
 	return topLevelPosts
 }
 
-func CreatePosts(ctx context.Context, db Querier, userPost, email string) (*Post, error) {
+func CreatePosts(ctx context.Context, db backend.Querier, userPost, email string) (*Post, error) {
 	// need get user id of the poster
 	uid, uidErr := accts.UserIDByEmail(email)
 
@@ -174,7 +169,7 @@ func CreatePosts(ctx context.Context, db Querier, userPost, email string) (*Post
 	return tempPost, nil
 }
 
-func ReplyToPost(ctx context.Context, db Querier, parentPID int, postBody, email string) (*Post, error) {
+func ReplyToPost(ctx context.Context, db backend.Querier, parentPID int, postBody, email string) (*Post, error) {
 
 	// need get user id of the poster
 	uid, uidErr := accts.UserIDByEmail(email)
