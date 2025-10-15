@@ -1,6 +1,7 @@
 package posts
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"scriptmang/drumstick/internal/accts"
@@ -26,6 +27,10 @@ type Post struct {
 func UsernameByID(id int) (string, error) {
 	ctx, db := backend.Connect()
 	defer db.Close()
+type Querier interface {
+	QueryRow(ctx context.Context, sql string, args ...any) pgx.Row
+	Exec(ctx context.Context, sql string, args ...any) (pgconn.CommandTag, error)
+}
 
 	var username string
 	err := db.QueryRow(ctx,
