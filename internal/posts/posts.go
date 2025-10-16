@@ -34,10 +34,7 @@ func UsernameByID(ctx context.Context, db backend.Querier, id int) (string, erro
 	return username, nil
 }
 
-func UserPostsByUserID(uid int) ([]*Post, error) {
-	ctx, db := backend.Connect()
-	defer db.Close()
-
+func UserPostsByUserID(ctx context.Context, db backend.Querier, uid int) ([]*Post, error) {
 	var userPosts []*Post
 	err := pgxscan.Select(ctx, db, &userPosts, `Select * FROM posts WHERE user_id = $1`, uid)
 	if err != nil {
@@ -51,10 +48,7 @@ func UserPostsByUserID(uid int) ([]*Post, error) {
 	return userPosts, nil
 }
 
-func UserIDByPostID(pid int) (int, error) {
-	ctx, db := backend.Connect()
-	defer db.Close()
-
+func UserIDByPostID(ctx context.Context, db backend.Querier, pid int) (int, error) {
 	var userID int
 	err := db.QueryRow(ctx,
 		`SELECT user_id FROM POSTS WHERE id=$1`, pid).Scan(&userID)
@@ -65,10 +59,7 @@ func UserIDByPostID(pid int) (int, error) {
 	return userID, nil
 }
 
-func UserPostByID(postID int) (Post, error) {
-	ctx, db := backend.Connect()
-	defer db.Close()
-
+func UserPostByID(ctx context.Context, db backend.Querier, postID int) (Post, error) {
 	var tempPost Post
 	queryErr := db.QueryRow(ctx,
 		`SELECT id, user_id, username, content FROM posts WHERE id=$1`, postID).
@@ -82,10 +73,7 @@ func UserPostByID(postID int) (Post, error) {
 }
 
 // returns the list of all user posts
-func UserPosts() ([]*Post, error) {
-	ctx, db := backend.Connect()
-	defer db.Close()
-
+func UserPosts(ctx context.Context, db backend.Querier) ([]*Post, error) {
 	var userPosts []*Post
 	err := pgxscan.Select(ctx, db, &userPosts, `Select * FROM posts`)
 	if err != nil {
@@ -101,10 +89,7 @@ func UserPosts() ([]*Post, error) {
 
 // deletes the user's post given their post id
 // returns the new list of posts
-func DeletePostByID(postID int) error {
-	ctx, db := backend.Connect()
-	defer db.Close()
-
+func DeletePostByID(ctx context.Context, db backend.Querier, postID int) error {
 	_, queryErr := db.Exec(ctx, `DELETE FROM POSTS WHERE id = $1`, postID)
 	if queryErr != nil {
 		return fmt.Errorf("error:%w", queryErr)

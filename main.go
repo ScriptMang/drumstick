@@ -188,7 +188,7 @@ func (s *Server) viewFeed(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, qryErr)
 	}
 
-	userPosts, qryErr := posts.UserPosts()
+	userPosts, qryErr := posts.UserPosts(c.Request().Context(), s.db)
 	if qryErr != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, qryErr)
 	}
@@ -231,7 +231,7 @@ func restricted(c echo.Context) error {
 	return c.Render(http.StatusOK, "sample", "Welcome "+email+"!")
 }
 
-func deletePosts(c echo.Context) error {
+func (s *Server) deletePosts(c echo.Context) error {
 
 	t, err := c.Cookie("auth")
 	if err != nil {
@@ -263,7 +263,7 @@ func deletePosts(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, convErr)
 	}
 
-	postUserID, err := posts.UserIDByPostID(postID)
+	postUserID, err := posts.UserIDByPostID(c.Request().Context(), s.db, postID)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err)
 	}
@@ -273,7 +273,7 @@ func deletePosts(c echo.Context) error {
 			"the post your trying to delete doesn't belong to your current session")
 	}
 
-	deleteQueryErr := posts.DeletePostByID(postID)
+	deleteQueryErr := posts.DeletePostByID(c.Request().Context(), s.db, postID)
 	if deleteQueryErr != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, deleteQueryErr)
 	}
@@ -416,7 +416,7 @@ func main() {
 
 	router.GET("/posts", svr.viewFeed)
 	router.POST("/posts", svr.addPosts)
-	router.POST("/posts/:id/delete", deletePosts)
+	router.POST("/posts/:id/delete", svr.deletePosts)
 	router.GET("/posts/:id/reply", svr.viewResponsePage)
 	router.POST("/posts/:id/reply", svr.submitResponse)
 
