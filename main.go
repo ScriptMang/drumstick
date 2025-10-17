@@ -293,7 +293,7 @@ func (s *Server) viewResponsePage(c echo.Context) error {
 	claims, err := sessionmanager.GetUserCustomClaims(t.Value, []byte(os.Getenv("HMAC_SECRET")))
 
 	email := claims.Email
-	uid, uidErr := accts.UserIDByEmail(email)
+	uid, uidErr := accts.UserIDByEmail(c.Request().Context(), s.db, email)
 	if uidErr != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err)
 	}
@@ -309,7 +309,7 @@ func (s *Server) viewResponsePage(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, convErr)
 	}
 
-	parentPost, err := posts.UserPostByID(postID)
+	parentPost, err := posts.UserPostByID(c.Request().Context(), s.db, postID)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err)
 	}
