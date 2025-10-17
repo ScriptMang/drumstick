@@ -5,7 +5,8 @@ import (
 )
 
 func Test_connection(t *testing.T) {
-	ctx, db := Connect()
+	db := Connect()
+	ctx := t.Context()
 	defer db.Close()
 
 	failedDBConn := db.Ping(ctx)
