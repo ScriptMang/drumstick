@@ -58,6 +58,11 @@ func Test_UsernameByID(t *testing.T) {
 	}
 	defer tx.Rollback(ctx)
 
+	_, resetErr := tx.Exec(ctx, "TRUNCATE user_account RESTART IDENTITY CASCADE")
+	if resetErr != nil {
+		t.Fatal(resetErr)
+	}
+
 	// before insert need to encrypt password, but it’s a private func
 	// meaning i need to create an acct object
 	dummyAcct := accts.Account{
