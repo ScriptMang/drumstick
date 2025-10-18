@@ -52,16 +52,16 @@ func Test_UsernameByID(t *testing.T) {
 	ctx := t.Context()
 	defer pool.Close()
 
+	_, resetErr := pool.Exec(ctx, "TRUNCATE user_account RESTART IDENTITY CASCADE")
+	if resetErr != nil {
+		t.Fatal(resetErr)
+	}
+
 	tx, err := pool.Begin(ctx)
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer tx.Rollback(ctx)
-
-	_, resetErr := tx.Exec(ctx, "TRUNCATE user_account RESTART IDENTITY CASCADE")
-	if resetErr != nil {
-		t.Fatal(resetErr)
-	}
 
 	// before insert need to encrypt password, but it’s a private func
 	// meaning i need to create an acct object
@@ -95,12 +95,43 @@ func Test_CreatePosts(t *testing.T) {
 	ctx := t.Context()
 	defer pool.Close()
 
+	_, resetErr := pool.Exec(ctx, "TRUNCATE user_account RESTART IDENTITY CASCADE")
+	if resetErr != nil {
+		t.Fatal(resetErr)
+	}
+
 	tx, err := pool.Begin(ctx)
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer tx.Rollback(ctx)
 
+	dummyAcct := accts.Account{
+		Fname:    "demo",
+		Lname:    "man",
+		Username: "tester",
+		Address:  "174 maple street",
+		Email:    "lazors504@gmail.com",
+		Password: []byte("crazyMango003"),
+	}
+
+	// register the acct -> user-acct & user-profile
+	_, regErr := accts.CreateAcct(ctx, tx, dummyAcct)
+	if regErr != nil {
+		t.Fatal(regErr)
+	}
+
+	// submit a new post
+	expected := "message 1"
+	testPost, postErr := CreatePosts(ctx, tx, "message 1", dummyAcct.Email)
+	if err != nil {
+		t.Fatal(postErr)
+	}
+
+	if testPost.Content != expected {
+		t.Fatalf("Expected: %s got: %s", testPost.Content, expected)
+	}
+}
 	_, resetErr := tx.Exec(ctx, "TRUNCATE user_account RESTART IDENTITY CASCADE")
 	if resetErr != nil {
 		t.Fatal(resetErr)
