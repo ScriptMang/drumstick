@@ -138,7 +138,7 @@ func CreatePosts(ctx context.Context, db backend.Querier, userPost, email string
 
 	var tempPost = new(Post)
 	err := db.QueryRow(ctx, `INSERT INTO posts(parent_id, user_id, username, content)`+
-		` VALUES($1,$2,$3,$4) RETURNING *`, 0, uid, username, userPost).Scan(
+		` VALUES($1,$2,$3,$4) RETURNING id, user_id, username, content, created_on`, 0, uid, username, userPost).Scan(
 		&tempPost.ID, &tempPost.UserID, &tempPost.Username,
 		&tempPost.Content, &tempPost.CreatedOn,
 	)
