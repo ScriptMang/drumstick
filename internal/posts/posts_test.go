@@ -1,6 +1,7 @@
 package posts
 
 import (
+	"context"
 	"fmt"
 	"html/template"
 	"scriptmang/drumstick/internal/accts"
@@ -8,6 +9,7 @@ import (
 	"scriptmang/drumstick/internal/testutils"
 	"testing"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
@@ -49,45 +51,36 @@ func setupEchoClient() *echo.Echo {
 // tests the func that returns the username of a post given the account id
 func Test_UsernameByID(t *testing.T) {
 	pool := testutils.TestPool(t)
-	ctx := t.Context()
 	defer pool.Close()
 
-	_, resetErr := pool.Exec(ctx, "TRUNCATE user_account RESTART IDENTITY CASCADE")
-	if resetErr != nil {
-		t.Fatal(resetErr)
-	}
+	testutils.ResetAndTestTx(t, pool, func(ctx context.Context, tx pgx.Tx) {
 
-	tx, err := pool.Begin(ctx)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer tx.Rollback(ctx)
+		// before insert need to encrypt password, but it’s a private func
+		// meaning i need to create an acct object
+		dummyAcct := accts.Account{
+			Fname:    "demo",
+			Lname:    "man",
+			Username: "tester",
+			Address:  "174 maple street",
+			Email:    "lazors504@gmail.com",
+			Password: []byte("crazyMango003"),
+		}
 
-	// before insert need to encrypt password, but it’s a private func
-	// meaning i need to create an acct object
-	dummyAcct := accts.Account{
-		Fname:    "demo",
-		Lname:    "man",
-		Username: "tester",
-		Address:  "174 maple street",
-		Email:    "lazors504@gmail.com",
-		Password: []byte("crazyMango003"),
-	}
+		// register the acct -> user-acct & user-profile
+		_, regErr := accts.CreateAcct(ctx, tx, dummyAcct)
+		if regErr != nil {
+			t.Fatal(regErr)
+		}
 
-	// register the acct -> user-acct & user-profile
-	_, regErr := accts.CreateAcct(ctx, tx, dummyAcct)
-	if regErr != nil {
-		t.Fatal(regErr)
-	}
+		username, err := UsernameByID(ctx, tx, 1)
+		if err != nil {
+			t.Fatal(err)
+		}
 
-	username, err := UsernameByID(ctx, tx, 1)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	if username != "tester" {
-		t.Errorf("expected tester, got %s", username)
-	}
+		if username != "tester" {
+			t.Errorf("expected tester, got %s", username)
+		}
+	})
 }
 
 func Test_CreatePosts(t *testing.T) {
