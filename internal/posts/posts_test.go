@@ -166,3 +166,73 @@ func Test_UserPostsByUserID(t *testing.T) {
 		}
 	})
 }
+
+func Test_UserPosts(t *testing.T) {
+	pool := testutils.TestPool(t)
+	defer pool.Close()
+
+	testutils.ResetAndTestTx(t, pool, func(ctx context.Context, tx pgx.Tx) {
+		dummyAcct1 := accts.Account{
+			Fname:    "bob",
+			Lname:    "anglefish",
+			Username: "tester1",
+			Address:  "174 maple street",
+			Email:    "lazors504@gmail.com",
+			Password: []byte("crazyMango003"),
+		}
+
+		// create func to make dummy accts
+		dummyAcct2 := accts.Account{
+			Fname:    "jacob",
+			Lname:    "loftwood",
+			Username: "tester2",
+			Address:  "403 mumble street",
+			Email:    "baseballChamp@gmail.com",
+			Password: []byte("dynamoPoppler952"),
+		}
+
+		_, regErr := accts.CreateAcct(ctx, tx, dummyAcct1)
+		if regErr != nil {
+			t.Fatal(regErr)
+		}
+
+		_, regErr = accts.CreateAcct(ctx, tx, dummyAcct2)
+		if regErr != nil {
+			t.Fatal(regErr)
+		}
+
+		testPost1, createPostErr := CreatePosts(ctx, tx, "message 1", dummyAcct1.Email)
+		if createPostErr != nil {
+			t.Fatal(createPostErr)
+		}
+
+		testPost2, createPostErr := CreatePosts(ctx, tx, "message 2", dummyAcct2.Email)
+		if createPostErr != nil {
+			t.Fatal(createPostErr)
+		}
+
+		postLst, postLstErr := UserPosts(ctx, tx)
+		if postLstErr != nil {
+			t.Fatal(postLstErr)
+		}
+
+		// prove the posts are from different users by checking their id
+		if postLst[0].UserID != testPost1.UserID {
+			t.Fatalf("Expected: %d but got: %d", testPost1.UserID, postLst[0].UserID)
+		}
+
+		if postLst[1].UserID != testPost2.UserID {
+			t.Fatalf("Expected: %d but got: %d", testPost2.UserID, postLst[1].UserID)
+		}
+
+		// Make sure the post's msg match the expected msg
+		if postLst[0].Content != testPost1.Content {
+			t.Fatalf("Expected: %s but got: %s", testPost1.Content, postLst[0].Content)
+		}
+
+		if postLst[1].Content != testPost2.Content {
+			t.Fatalf("Expected: %s but got: %s", testPost2.Content, postLst[1].Content)
+		}
+	})
+
+}
