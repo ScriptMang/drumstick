@@ -5,6 +5,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -26,4 +27,22 @@ func TestPool(t *testing.T) *pgxpool.Pool {
 	})
 
 	return pool
+}
+
+func ResetAndTestTx(t *testing.T, db *pgxpool.Pool, fn func(ctx context.Context, tx pgx.Tx)) {
+	t.Helper()
+	ctx := context.Background()
+
+	_, resetErr := db.Exec(ctx, "TRUNCATE user_account RESTART IDENTITY CASCADE")
+	if resetErr != nil {
+		t.Fatal(resetErr)
+	}
+
+	tx, err := db.Begin(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer tx.Rollback(ctx)
+
+	fn(ctx, tx)
 }
