@@ -142,14 +142,14 @@ func Test_UserPostsByUserID(t *testing.T) {
 		}
 
 		// submit a new post
-		testPost1, postErr := CreatePosts(ctx, tx, "message 1", dummyAcct.Email)
-		if postErr != nil {
-			t.Fatal(postErr)
-		}
-
-		testPost2, postErr := CreatePosts(ctx, tx, "message 2", dummyAcct.Email)
-		if postErr != nil {
-			t.Fatal(postErr)
+		postMsgs := []string{"message 1", "message 2"}
+		var actualPosts []*Post
+		for _, msg := range postMsgs {
+			testPost, postErr := CreatePosts(ctx, tx, msg, dummyAcct.Email)
+			if postErr != nil {
+				t.Fatal(postErr)
+			}
+			actualPosts = append(actualPosts, testPost)
 		}
 
 		dummyPosts, err := UserPostsByUserID(ctx, tx, uid)
@@ -157,12 +157,10 @@ func Test_UserPostsByUserID(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		if dummyPosts[0].Content != testPost1.Content {
-			t.Fatalf("Expected: %s but got: %s", testPost1.Content, dummyPosts[0].Content)
-		}
-
-		if dummyPosts[1].Content != testPost2.Content {
-			t.Fatalf("Expected: %s but got: %s", testPost2.Content, dummyPosts[1].Content)
+		for idx, dummyPost := range dummyPosts {
+			if dummyPost.Content != actualPosts[idx].Content {
+				t.Fatalf("Expected: %s but got: %s", actualPosts[idx].Content, dummyPost.Content)
+			}
 		}
 	})
 }
@@ -218,5 +216,4 @@ func Test_UserPosts(t *testing.T) {
 			}
 		}
 	})
-
 }
