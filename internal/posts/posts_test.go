@@ -116,21 +116,53 @@ func Test_CreatePosts(t *testing.T) {
 	})
 }
 
+func Test_UserPostsByUserID(t *testing.T) {
+	pool := testutils.TestPool(t)
+	defer pool.Close()
 
-	// register the acct -> user-acct & user-profile
-	_, regErr := accts.CreateAcct(ctx, tx, dummyAcct)
-	if regErr != nil {
-		t.Fatal(regErr)
-	}
+	testutils.ResetAndTestTx(t, pool, func(ctx context.Context, tx pgx.Tx) {
+		dummyAcct := accts.Account{
+			Fname:    "demo",
+			Lname:    "man",
+			Username: "tester",
+			Address:  "174 maple street",
+			Email:    "lazors504@gmail.com",
+			Password: []byte("crazyMango003"),
+		}
 
-	// submit a new post
-	expected := "message 1"
-	testPost, postErr := CreatePosts(ctx, tx, "message 1", dummyAcct.Email)
-	if err != nil {
-		t.Fatal(postErr)
-	}
+		// register the acct -> user-acct & user-profile
+		_, regErr := accts.CreateAcct(ctx, tx, dummyAcct)
+		if regErr != nil {
+			t.Fatal(regErr)
+		}
 
-	if testPost.Content != expected {
-		t.Fatalf("Expected: %s got: %s", testPost.Content, expected)
-	}
+		uid, emailErr := accts.UserIDByEmail(ctx, tx, dummyAcct.Email)
+		if emailErr != nil {
+			t.Fatal(emailErr)
+		}
+
+		// submit a new post
+		testPost1, postErr := CreatePosts(ctx, tx, "message 1", dummyAcct.Email)
+		if postErr != nil {
+			t.Fatal(postErr)
+		}
+
+		testPost2, postErr := CreatePosts(ctx, tx, "message 2", dummyAcct.Email)
+		if postErr != nil {
+			t.Fatal(postErr)
+		}
+
+		dummyPosts, err := UserPostsByUserID(ctx, tx, uid)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		if dummyPosts[0].Content != testPost1.Content {
+			t.Fatalf("Expected: %s but got: %s", testPost1.Content, dummyPosts[0].Content)
+		}
+
+		if dummyPosts[1].Content != testPost2.Content {
+			t.Fatalf("Expected: %s but got: %s", testPost2.Content, dummyPosts[1].Content)
+		}
+	})
 }
