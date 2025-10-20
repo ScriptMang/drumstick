@@ -254,6 +254,52 @@ func Test_UserPostByID(t *testing.T) {
 
 		if actualPost.UserID != expectedPosts[0].UserID {
 			t.Fatalf("Expected: %d but got: %d", expectedPosts[0].UserID, actualPost.UserID)
+
+func Test_UserIDByPostID(t *testing.T) {
+	pool := testutils.TestPool(t)
+	defer pool.Close()
+
+	testutils.ResetAndTestTx(t, pool, func(ctx context.Context, tx pgx.Tx) {
+		dummyAccts := []accts.Account{{
+			Fname:    "bob",
+			Lname:    "anglefish",
+			Username: "tester1",
+			Address:  "174 maple street",
+			Email:    "lazors504@gmail.com",
+			Password: []byte("crazyMango003"),
+		}, {
+			Fname:    "jacob",
+			Lname:    "loftwood",
+			Username: "tester2",
+			Address:  "403 mumble street",
+			Email:    "baseballChamp@gmail.com",
+			Password: []byte("dynamoPoppler952"),
+		},
+		}
+
+		var testPosts []*Post
+		for idx, dummyAcct := range dummyAccts {
+			_, regErr := accts.CreateAcct(ctx, tx, dummyAcct)
+			if regErr != nil {
+				t.Fatal(regErr)
+			}
+			msg := fmt.Sprintf("message %d", idx+1)
+			testPost, createPostErr := CreatePosts(ctx, tx, msg, dummyAcct.Email)
+			if createPostErr != nil {
+				t.Fatal(createPostErr)
+			}
+			testPosts = append(testPosts, testPost)
+		}
+
+		for i := 0; i < 2; i++ {
+			val, err := UserIDByPostID(ctx, tx, i+1)
+			if err != nil {
+				t.Fatal(err)
+			}
+			expectedUserID := testPosts[i].UserID
+			if val != expectedUserID {
+				t.Fatalf("Expected: %d but got: %d", expectedUserID, val)
+			}
 		}
 	})
 }
