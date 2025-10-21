@@ -252,8 +252,11 @@ func Test_UserPostByID(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		if actualPost.UserID != expectedPosts[0].UserID {
-			t.Fatalf("Expected: %d but got: %d", expectedPosts[0].UserID, actualPost.UserID)
+		if actualPost.Content != expectedPosts[0].Content {
+			t.Fatalf("Expected: %s but got: %s", expectedPosts[0].Content, actualPost.Content)
+		}
+	})
+}
 
 func Test_UserIDByPostID(t *testing.T) {
 	pool := testutils.TestPool(t)
