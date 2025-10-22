@@ -308,7 +308,7 @@ func Test_UserIDByPostID(t *testing.T) {
 	})
 }
 
-func Test_DeletePostsByID(t *testing.T) {
+func Test_DeletePostByID(t *testing.T) {
 	pool := testutils.TestPool(t)
 	defer pool.Close()
 
