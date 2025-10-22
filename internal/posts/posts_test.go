@@ -2,6 +2,7 @@ package posts
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"html/template"
 	"scriptmang/drumstick/internal/accts"
@@ -303,6 +304,43 @@ func Test_UserIDByPostID(t *testing.T) {
 			if val != expectedUserID {
 				t.Fatalf("Expected: %d but got: %d", expectedUserID, val)
 			}
+		}
+	})
+}
+
+func Test_DeletePostsByID(t *testing.T) {
+	pool := testutils.TestPool(t)
+	defer pool.Close()
+
+	testutils.ResetAndTestTx(t, pool, func(ctx context.Context, tx pgx.Tx) {
+		dummyAcct := accts.Account{
+			Fname:    "bob",
+			Lname:    "anglefish",
+			Username: "tester1",
+			Address:  "174 maple street",
+			Email:    "lazors504@gmail.com",
+			Password: []byte("crazyMango003"),
+		}
+
+		_, regErr := accts.CreateAcct(ctx, tx, dummyAcct)
+		if regErr != nil {
+			t.Fatal(regErr)
+		}
+
+		_, createPostErr := CreatePosts(ctx, tx, "message 1", dummyAcct.Email)
+		if createPostErr != nil {
+			t.Fatal(createPostErr)
+		}
+
+		deletePostErr := DeletePostByID(ctx, tx, 1)
+		if regErr != nil {
+			t.Fatal(deletePostErr)
+		}
+
+		tempPost := new(Post)
+		err := tx.QueryRow(ctx, `SELECT * FROM posts WHERE id=1`).Scan(&tempPost)
+		if errors.Is(err, pgx.ErrNoRows) == false && tempPost.ID != 0 {
+			t.Fatal("The Post with ID=1 can still be queried after being deleted.")
 		}
 	})
 }
