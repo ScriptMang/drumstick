@@ -382,3 +382,46 @@ func Test_MakePostsTree(t *testing.T) {
 		t.Fatalf("Expected Parent 2's Reply to be: reply3, not: %s\n", parent2Reply.Content)
 	}
 }
+
+func Test_ReplyToPosts(t *testing.T) {
+	pool := testutils.TestPool(t)
+	defer pool.Close()
+
+	testutils.ResetAndTestTx(t, pool, func(ctx context.Context, tx pgx.Tx) {
+		dummyAcct := accts.Account{
+			Fname:    "bob",
+			Lname:    "anglefish",
+			Username: "tester1",
+			Address:  "174 maple street",
+			Email:    "lazors504@gmail.com",
+			Password: []byte("crazyMango003"),
+		}
+
+		_, regErr := accts.CreateAcct(ctx, tx, dummyAcct)
+		if regErr != nil {
+			t.Fatal(regErr)
+		}
+
+		_, createPostErr := CreatePosts(ctx, tx, "message 1", dummyAcct.Email)
+		if createPostErr != nil {
+			t.Fatal(createPostErr)
+		}
+
+		reply, replyErr := ReplyToPost(ctx, tx, 1, "reply1", dummyAcct.Email)
+		if replyErr != nil {
+			t.Fatal(replyErr)
+		}
+
+		if reply.ID != 2 {
+			t.Fatalf("Expected the post-id to be: 2, not: %d", reply.ID)
+		}
+
+		if reply.ParentID != 1 {
+			t.Fatalf("Expected the parent-id to be: 1, not: %d", reply.ParentID)
+		}
+
+		if reply.Content != "reply1" {
+			t.Fatalf("Expected the content to be: 'reply1', not: %s", reply.Content)
+		}
+	})
+}
