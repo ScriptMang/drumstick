@@ -360,119 +360,25 @@ func createMultipleReplies(t *testing.T, ctx context.Context, tx pgx.Tx, numPost
 }
 
 func Test_MakePostsTree(t *testing.T) {
-	pool := testutils.TestPool(t)
-	defer pool.Close()
+	somePosts := []*Post{
+		{ID: 1, ParentID: 0, UserID: 1, Content: "parent1"},
+		{ID: 2, ParentID: 1, UserID: 2, Content: "reply1"},
+		{ID: 3, ParentID: 1, UserID: 3, Content: "reply2"},
+		{ID: 4, ParentID: 0, UserID: 4, Content: "parent2"},
+		{ID: 5, ParentID: 4, UserID: 5, Content: "reply3"},
+	}
 
-	testutils.ResetAndTestTx(t, pool, func(ctx context.Context, tx pgx.Tx) {
-		dummyAccts := []accts.Account{{
-			Fname:    "bob",
-			Lname:    "anglefish",
-			Username: "tester1",
-			Address:  "174 maple street",
-			Email:    "lazors504@gmail.com",
-			Password: []byte("crazyMango003"),
-		}, {
-			Fname:    "jacob",
-			Lname:    "loftwood",
-			Username: "tester2",
-			Address:  "403 mumble street",
-			Email:    "baseballChamp@gmail.com",
-			Password: []byte("dynamoPoppler952"),
-		}}
-
-		expectedTopPosts := []*Post{{
-			ID:       1,
-			ParentID: 0,
-			UserID:   1,
-			Username: "tester1",
-			Content:  "message 1",
-			Replies: []*Post{
-				{
-					ID:       2,
-					ParentID: 1,
-					UserID:   2,
-					Username: "tester1",
-					Content:  "reply 1"},
-				{
-					ID:       3,
-					ParentID: 1,
-					UserID:   3,
-					Username: "tester1",
-					Content:  "reply 2"},
-				{
-					ID:       4,
-					ParentID: 1,
-					UserID:   4,
-					Username: "tester1",
-					Content:  "reply 3"},
-			},
-		}, {
-			ID:       5,
-			ParentID: 0,
-			UserID:   5,
-			Username: "tester2",
-			Content:  "message 1",
-			Replies: []*Post{
-				{
-					ID:       6,
-					ParentID: 5,
-					UserID:   6,
-					Username: "tester2",
-					Content:  "reply 1"},
-				{
-					ID:       7,
-					ParentID: 5,
-					UserID:   7,
-					Username: "tester2",
-					Content:  "reply 2"},
-				{
-					ID:       8,
-					ParentID: 5,
-					UserID:   8,
-					Username: "tester2",
-					Content:  "reply 3"},
-			},
-		}}
-
-		fmt.Printf("This is the expected number of Parent Posts: %d\n", len(expectedTopPosts))
-		fmt.Printf("This is the expected number of Replies for each Parent Post: %d\n", len(expectedTopPosts[0].Replies))
-
-		for _, dummyAcct := range dummyAccts {
-			_, regErr := accts.CreateAcct(ctx, tx, dummyAcct)
-			if regErr != nil {
-				t.Fatal(regErr)
-			}
-
-			_, err := CreatePosts(ctx, tx, "message 1", dummyAcct.Email)
-			if err != nil {
-				t.Fatal(err)
-			}
-
-			_, err = createMultipleReplies(t, ctx, tx, 3, dummyAcct)
-			if err != nil {
-				t.Fatal(err)
-			}
-		}
-
-		actualPosts, failedRetreivalErr := UserPosts(ctx, tx)
-		if failedRetreivalErr != nil {
-			t.Fatal(failedRetreivalErr)
-		}
-		actualTopPosts := MakePostsTree(actualPosts)
-		fmt.Printf("There are %d actualParentPosts\n", len(actualTopPosts))
-		fmt.Printf("There are %d replies for this actualParentPost\n", len(actualTopPosts[1].Replies))
-
-		for i := range 2 {
-			fmt.Println("ExpectedParentPosts counter: ", i)
-			actualReplies := actualTopPosts[i].Replies
-			for idx, expectedReply := range expectedTopPosts[i].Replies {
-				fmt.Println("ExpectedReply counter: ", idx)
-				actualReply := actualReplies[idx]
-				fmt.Printf("ActualReply: %s vs ExpectedReply: %s\n", actualReply.Content, expectedReply.Content)
-				if actualReply.Content != expectedReply.Content {
-					t.Fatalf("Expected the post: %v got %v", expectedReply, actualReply)
-				}
-			}
-		}
-	})
+	postTree := MakePostsTree(somePosts)
+	numParents := len(postTree)
+	if numParents != 2 {
+		t.Fatalf("Expected Post-Tree parents to be: 2, not: %d\n", numParents)
+	}
+	parent1ReplySize := len(postTree[0].Replies)
+	if parent1ReplySize != 2 {
+		t.Fatalf("Expected the # of Parent 1's Replies to be: 2, not: %d\n", parent1ReplySize)
+	}
+	parent2Reply := postTree[1].Replies[0]
+	if parent2Reply.Content != "reply3" {
+		t.Fatalf("Expected Parent 2's Reply to be: reply3, not: %s\n", parent2Reply.Content)
+	}
 }
