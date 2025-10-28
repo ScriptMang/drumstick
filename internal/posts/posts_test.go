@@ -55,9 +55,6 @@ func Test_UsernameByID(t *testing.T) {
 	defer pool.Close()
 
 	testutils.ResetAndTestTx(t, pool, func(ctx context.Context, tx pgx.Tx) {
-
-		// before insert need to encrypt password, but it’s a private func
-		// meaning i need to create an acct object
 		dummyAcct := accts.Account{
 			Fname:    "demo",
 			Lname:    "man",
