@@ -345,20 +345,6 @@ func Test_DeletePostByID(t *testing.T) {
 	})
 }
 
-func createMultipleReplies(t *testing.T, ctx context.Context, tx pgx.Tx, numPosts int, acct accts.Account) ([]*Post, error) {
-	t.Helper()
-	var rsltPosts []*Post
-	for i := 0; i < numPosts; i++ {
-		count := fmt.Sprintf("%d", i+1)
-		tempPost, err := ReplyToPost(ctx, tx, acct.ID, "reply "+count, acct.Email)
-		if err != nil {
-			t.Fatal("Could not create post in create-multiple-post func")
-		}
-		rsltPosts = append(rsltPosts, tempPost)
-	}
-	return rsltPosts, nil
-}
-
 func Test_MakePostsTree(t *testing.T) {
 	somePosts := []*Post{
 		{ID: 1, ParentID: 0, UserID: 1, Content: "parent1"},
