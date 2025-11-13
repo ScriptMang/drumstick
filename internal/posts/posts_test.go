@@ -233,21 +233,16 @@ func Test_UserIDByPostID(t *testing.T) {
 	defer pool.Close()
 
 	testutils.ResetAndTestTx(t, pool, func(ctx context.Context, tx pgx.Tx) {
-		dummyAccts := []accts.Account{{
-			Fname:    "bob",
-			Lname:    "anglefish",
-			Username: "tester1",
-			Address:  "174 maple street",
-			Email:    "lazors504@gmail.com",
-			Password: []byte("crazyMango003"),
-		}, {
-			Fname:    "jacob",
-			Lname:    "loftwood",
-			Username: "tester2",
-			Address:  "403 mumble street",
-			Email:    "baseballChamp@gmail.com",
-			Password: []byte("dynamoPoppler952"),
-		},
+		testDataPath := filepath.Join("testdata", "dummyAccts.json")
+		jsonData, readErr := os.ReadFile(testDataPath)
+		if readErr != nil {
+			t.Fatal(readErr)
+		}
+
+		dummyAccts := make([]accts.Account, 2)
+		bindingErr := json.Unmarshal(jsonData, &dummyAccts)
+		if bindingErr != nil {
+			t.Fatal(bindingErr)
 		}
 
 		var testPosts []*Post
