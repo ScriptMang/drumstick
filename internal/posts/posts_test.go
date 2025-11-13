@@ -2,8 +2,11 @@ package posts
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"os"
+	"path/filepath"
 	"scriptmang/drumstick/internal/accts"
 	"scriptmang/drumstick/internal/testutils"
 	"testing"
@@ -81,13 +84,16 @@ func Test_UserPostsByUserID(t *testing.T) {
 	defer pool.Close()
 
 	testutils.ResetAndTestTx(t, pool, func(ctx context.Context, tx pgx.Tx) {
-		dummyAcct := accts.Account{
-			Fname:    "demo",
-			Lname:    "man",
-			Username: "tester",
-			Address:  "174 maple street",
-			Email:    "lazors504@gmail.com",
-			Password: []byte("crazyMango003"),
+		testDataPath := filepath.Join("testdata", "dummyAcct.json")
+		jsonData, readErr := os.ReadFile(testDataPath)
+		if readErr != nil {
+			t.Fatal(readErr)
+		}
+
+		var dummyAcct accts.Account
+		bindingErr := json.Unmarshal(jsonData, &dummyAcct)
+		if bindingErr != nil {
+			t.Fatal(bindingErr)
 		}
 
 		// register the acct -> user-acct & user-profile
@@ -130,21 +136,16 @@ func Test_UserPosts(t *testing.T) {
 	defer pool.Close()
 
 	testutils.ResetAndTestTx(t, pool, func(ctx context.Context, tx pgx.Tx) {
-		dummyAccts := []accts.Account{{
-			Fname:    "bob",
-			Lname:    "anglefish",
-			Username: "tester1",
-			Address:  "174 maple street",
-			Email:    "lazors504@gmail.com",
-			Password: []byte("crazyMango003"),
-		}, {
-			Fname:    "jacob",
-			Lname:    "loftwood",
-			Username: "tester2",
-			Address:  "403 mumble street",
-			Email:    "baseballChamp@gmail.com",
-			Password: []byte("dynamoPoppler952"),
-		},
+		testDataPath := filepath.Join("testdata", "dummyAccts.json")
+		jsonData, readErr := os.ReadFile(testDataPath)
+		if readErr != nil {
+			t.Fatal(readErr)
+		}
+
+		dummyAccts := make([]accts.Account, 2)
+		bindingErr := json.Unmarshal(jsonData, &dummyAccts)
+		if bindingErr != nil {
+			t.Fatal(bindingErr)
 		}
 
 		var actualPosts []*Post

@@ -1,0 +1,17 @@
+[{
+	"Fname":    "bob",
+	"Lname":    "anglefish",
+	"Username": "tester1",
+	"Address":  "174 maple street",
+	"Email":    "lazors504@gmail.com",
+	"Password": "Y3JhenlNYW5nbzAwMw=="
+},
+{
+    "Fname":    "jacob",
+    "Lname":    "loftwood",
+    "Username": "tester2",
+    "Address":  "403 mumble street",
+    "Email":    "baseballChamp@gmail.com",
+    "Password": "ZHluYW1vUG9wcGxlcjk1Mg=="
+}]
+
