@@ -20,13 +20,16 @@ func Test_UsernameByID(t *testing.T) {
 	defer pool.Close()
 
 	testutils.ResetAndTestTx(t, pool, func(ctx context.Context, tx pgx.Tx) {
-		dummyAcct := accts.Account{
-			Fname:    "demo",
-			Lname:    "man",
-			Username: "tester",
-			Address:  "174 maple street",
-			Email:    "lazors504@gmail.com",
-			Password: []byte("crazyMango003"),
+		testDataPath := filepath.Join("testdata", "dummyAcct.json")
+		jsonData, readErr := os.ReadFile(testDataPath)
+		if readErr != nil {
+			t.Fatal(readErr)
+		}
+
+		var dummyAcct accts.Account
+		bindingErr := json.Unmarshal(jsonData, &dummyAcct)
+		if bindingErr != nil {
+			t.Fatal(bindingErr)
 		}
 
 		// register the acct -> user-acct & user-profile
@@ -40,7 +43,7 @@ func Test_UsernameByID(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		if username != "tester" {
+		if username != "tester1" {
 			t.Errorf("expected tester, got %s", username)
 		}
 	})
@@ -51,13 +54,16 @@ func Test_CreatePosts(t *testing.T) {
 	defer pool.Close()
 
 	testutils.ResetAndTestTx(t, pool, func(ctx context.Context, tx pgx.Tx) {
-		dummyAcct := accts.Account{
-			Fname:    "demo",
-			Lname:    "man",
-			Username: "tester",
-			Address:  "174 maple street",
-			Email:    "lazors504@gmail.com",
-			Password: []byte("crazyMango003"),
+		testDataPath := filepath.Join("testdata", "dummyAcct.json")
+		jsonData, readErr := os.ReadFile(testDataPath)
+		if readErr != nil {
+			t.Fatal(readErr)
+		}
+
+		var dummyAcct accts.Account
+		bindingErr := json.Unmarshal(jsonData, &dummyAcct)
+		if bindingErr != nil {
+			t.Fatal(bindingErr)
 		}
 
 		// register the acct -> user-acct & user-profile
@@ -184,13 +190,16 @@ func Test_UserPostByID(t *testing.T) {
 	defer pool.Close()
 
 	testutils.ResetAndTestTx(t, pool, func(ctx context.Context, tx pgx.Tx) {
-		dummyAcct := accts.Account{
-			Fname:    "bob",
-			Lname:    "anglefish",
-			Username: "tester1",
-			Address:  "174 maple street",
-			Email:    "lazors504@gmail.com",
-			Password: []byte("crazyMango003"),
+		testDataPath := filepath.Join("testdata", "dummyAcct.json")
+		jsonData, readErr := os.ReadFile(testDataPath)
+		if readErr != nil {
+			t.Fatal(readErr)
+		}
+
+		var dummyAcct accts.Account
+		bindingErr := json.Unmarshal(jsonData, &dummyAcct)
+		if bindingErr != nil {
+			t.Fatal(bindingErr)
 		}
 
 		_, regErr := accts.CreateAcct(ctx, tx, dummyAcct)
@@ -273,13 +282,16 @@ func Test_DeletePostByID(t *testing.T) {
 	defer pool.Close()
 
 	testutils.ResetAndTestTx(t, pool, func(ctx context.Context, tx pgx.Tx) {
-		dummyAcct := accts.Account{
-			Fname:    "bob",
-			Lname:    "anglefish",
-			Username: "tester1",
-			Address:  "174 maple street",
-			Email:    "lazors504@gmail.com",
-			Password: []byte("crazyMango003"),
+		testDataPath := filepath.Join("testdata", "dummyAcct.json")
+		jsonData, readErr := os.ReadFile(testDataPath)
+		if readErr != nil {
+			t.Fatal(readErr)
+		}
+
+		var dummyAcct accts.Account
+		bindingErr := json.Unmarshal(jsonData, &dummyAcct)
+		if bindingErr != nil {
+			t.Fatal(bindingErr)
 		}
 
 		_, regErr := accts.CreateAcct(ctx, tx, dummyAcct)
@@ -334,13 +346,16 @@ func Test_ReplyToPosts(t *testing.T) {
 	defer pool.Close()
 
 	testutils.ResetAndTestTx(t, pool, func(ctx context.Context, tx pgx.Tx) {
-		dummyAcct := accts.Account{
-			Fname:    "bob",
-			Lname:    "anglefish",
-			Username: "tester1",
-			Address:  "174 maple street",
-			Email:    "lazors504@gmail.com",
-			Password: []byte("crazyMango003"),
+		testDataPath := filepath.Join("testdata", "dummyAcct.json")
+		jsonData, readErr := os.ReadFile(testDataPath)
+		if readErr != nil {
+			t.Fatal(readErr)
+		}
+
+		var dummyAcct accts.Account
+		bindingErr := json.Unmarshal(jsonData, &dummyAcct)
+		if bindingErr != nil {
+			t.Fatal(bindingErr)
 		}
 
 		_, regErr := accts.CreateAcct(ctx, tx, dummyAcct)
