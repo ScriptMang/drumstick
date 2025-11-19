@@ -1,0 +1,14 @@
+{
+    "testname": "Password has no digits",
+    "attribNames": [
+      "password",
+      "password",
+      "password"
+    ],
+    "fname": "Jon",
+    "lname": "Martin",
+    "address": "409 Alistar Road",
+    "username": "testUser17",
+    "email": "dummy59@gmail.com",
+    "password": "cGFzc3dvcmRwb21wcHBwcA=="
+  }

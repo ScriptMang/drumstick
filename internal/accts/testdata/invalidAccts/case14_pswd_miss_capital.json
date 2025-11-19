@@ -1,0 +1,12 @@
+{
+    "testname": "Missing at least One Capital Letter in Password",
+    "attribNames": [
+      "password"
+    ],
+    "fname": "Jon",
+    "lname": "Martin",
+    "address": "409 Alistar Road",
+    "username": "testUser13",
+    "email": "dummy59@gmail.com",
+    "password": "cGFzc3dvcmRwb21wNDMy"
+  }

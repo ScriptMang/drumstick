@@ -1,0 +1,12 @@
+{
+    "testname": "Empty Password",
+    "attribNames": [
+      "password"
+    ],
+    "fname": "Jon",
+    "lname": "Martin",
+    "address": "409 Alistar Road",
+    "username": "testUser14",
+    "email": "dummy59@gmail.com",
+    "password": ""
+ }

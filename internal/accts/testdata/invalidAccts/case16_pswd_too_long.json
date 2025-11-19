@@ -1,0 +1,12 @@
+{
+    "testname": "Password is too long",
+    "attribNames": [
+      "password"
+    ],
+    "fname": "Jon",
+    "lname": "Martin",
+    "address": "409 Alistar Road",
+    "username": "testUser16",
+    "email": "dummy59@gmail.com",
+    "password": "cGFzc3dvcmRQb21wNDMyMzM0OTQ4NDczNDc0Mzc0MzIzMw=="
+  }
