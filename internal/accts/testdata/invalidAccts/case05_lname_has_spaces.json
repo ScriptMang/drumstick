@@ -1,0 +1,12 @@
+{
+    "testName": "No Spaces Found in Lname",
+    "attribNames": [
+      "lname"
+    ],
+    "fname": "Jon",
+    "lname": " Martin",
+    "username": "testUser3",
+    "address": "409 Alistar Road",
+    "email": "dummy59@gmail.com",
+    "password": "cGFzc3dvcmRQb21wNDMy"
+}

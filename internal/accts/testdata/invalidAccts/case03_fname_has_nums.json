@@ -1,0 +1,12 @@
+{
+    "testName": "No Numbers in Fname",
+    "attribNames": [
+      "fname"
+    ],
+    "fname": "Jon3",
+    "lname": "Martin",
+    "username": "testUser7",
+    "address": "409 Alistar Road",
+    "email": "dummy59@gmail.com",
+    "password": "cGFzc3dvcmRQb21wNDMy"
+}
