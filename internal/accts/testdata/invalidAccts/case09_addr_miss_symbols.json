@@ -1,0 +1,12 @@
+{
+    "testName": "No Symbols in Address",
+    "attribNames": [
+      "address"
+    ],
+    "fname": "Jon",
+    "lname": "Martin",
+    "username": "testUser9",
+    "address": "@409 Alistar Road",
+    "email": "dummy59@gmail.com",
+    "password": "cGFzc3dvcmRQb21wNDMy"
+}

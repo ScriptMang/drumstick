@@ -1,0 +1,12 @@
+{
+    "testName": "Invalid ending address in Email",
+    "attribNames": [
+      "email"
+    ],
+    "fname": "Jon",
+    "lname": "Martin",
+    "username": "testUser12",
+    "address": "409 Alistar Road",
+    "email": "dummy@gmail.dum",
+    "password": "cGFzc3dvcmRQb21wNDMy"
+}

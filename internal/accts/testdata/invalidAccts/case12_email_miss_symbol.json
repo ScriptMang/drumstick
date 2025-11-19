@@ -1,0 +1,12 @@
+{
+    "testName": "Missing '@' Symbol in Email",
+    "attribNames": [
+      "email"
+    ],
+    "fname": "Jon",
+    "lname": "Martin",
+    "username": "testUser10",
+    "address": "409 Alistar Road",
+    "email": "dummy59gmail.com",
+    "password": "cGFzc3dvcmRQb21wNDMy"
+  }
