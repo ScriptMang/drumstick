@@ -1,14 +1,19 @@
 package accts
 
 import (
+	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"html/template"
 	"net/http"
 	"net/http/httptest"
+	"os"
+	"path/filepath"
 	"testing"
 
 	"scriptmang/drumstick/internal/templateRenderer"
+	"scriptmang/drumstick/internal/testutils"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/labstack/echo/v4"
@@ -16,6 +21,18 @@ import (
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/crypto/bcrypt"
 )
+
+type create_acct_testcase struct {
+	TestName                               string
+	AttribNames                            []string
+	Fname, Lname, Username, Address, Email string
+	Password                               []byte
+	ErrLst                                 []error
+}
+type testcase struct {
+	path   string
+	errLst []error
+}
 
 func dict(vals ...any) (map[string]any, error) {
 	if len(vals)%2 != 0 {
@@ -74,6 +91,22 @@ func Test_encryptPassword(t *testing.T) {
 	}
 }
 
+func bind_TestCase(t *testing.T, dir string, file string) create_acct_testcase {
+	t.Helper()
+	relFilePath := filepath.Join("testdata", dir, file)
+	jsonData, readErr := os.ReadFile(relFilePath)
+	if readErr != nil {
+		t.Fatal(readErr)
+	}
+
+	var testcase create_acct_testcase
+	bindingErr := json.Unmarshal(jsonData, &testcase)
+	if bindingErr != nil {
+		t.Fatal(bindingErr)
+	}
+	return testcase
+}
+
 func Test_accountcreation(t *testing.T) {
 	r := setupEchoClient()
 
@@ -95,29 +128,31 @@ func Test_accountcreation(t *testing.T) {
 	pswdHasSymbols := errors.New("field can't contain any symbols")
 	missingCapitalLetter := errors.New("field is missing at least 1 capital letter")
 
-	tests := []struct {
-		testName                               string
-		attribNames                            []string
-		fname, lname, address, username, email string
-		password                               []byte
-		errLst                                 []error
-	}{
-		// {"Empty Attributes", []string{"fname", "lname"}, "", "", "testUser1", "409 Alistar Road", "dummy59@gmail.com", []byte("passwordPomp432"), []error{errEmptyField, errEmptyField}},
-		// {"No Spaces Found in Fname", []string{"fname"}, " Jon", "Martin", "testUser2", "409 Alistar Road", "dummy59@gmail.com", []byte("passwordPomp432"), []error{errHasPunct}},
-		// {"No Spaces Found in Lname", []string{"lname"}, "Jon", " Martin", "testUser3", "409 Alistar Road", "dummy59@gmail.com", []byte("passwordPomp432"), []error{errHasPunct}},
-		// {"No Spaces Found in Fname and Lname", []string{"fname", "lname"}, " Jon", " Martin", "testUser4", "409 Alistar Road", "dummy59@gmail.com", []byte("passwordPomp432"), []error{errHasPunct, errHasPunct}},
-		// {"No Symbols in Fname", []string{"fname"}, "Jon@", "Martin", "testUser5", "409 Alistar Road", "dummy59@gmail.com", []byte("passwordPomp432"), []error{errHasSymbols}},
-		// {"No Symbols in Lname", []string{"lname"}, "Jon", "@Martin", "testUser6", "409 Alistar Road", "dummy59@gmail.com", []byte("passwordPomp432"), []error{errHasSymbols}},
-		// {"No Numbers in Fname", []string{"fname"}, "Jon3", "Martin", "testUser7", "409 Alistar Road", "dummy59@gmail.com", []byte("passwordPomp432"), []error{errHasNums}},
-		// {"No Numbers in Lname", []string{"lname"}, "Jon", "Martin5", "testUser8", "409 Alistar Road", "dummy59@gmail.com", []byte("passwordPomp432"), []error{errHasNums}},
-		// {"No Symbols in Address", []string{"address"}, "Jon", "Martin", "testUser9", "@409 Alistar Road", "dummy59@gmail.com", []byte("passwordPomp432"), []error{errHasSymbols}},
-		// {"Missing '@' Symbol in Email", []string{"email"}, "Jon", "Martin", "testUser10", "409 Alistar Road", "dummy59gmail.com", []byte("passwordPomp432"), []error{errReqSymbol}},
-		// {"Invalid ending address in Email", []string{"email"}, "Jon", "Martin", "testUser12", "409 Alistar Road", "dummy@gmail.dum", []byte("passwordPomp432"), []error{errReqEndingAddr}},
-		// {"Missing at least One Capital Letter in Password", []string{"password"}, "Jon", "Martin", "testUser13", "409 Alistar Road", "dummy59@gmail.com", []byte("passwordpomp432"), []error{missingCapitalLetter}},
-		// {"Password is empty", []string{"password"}, "Jon", "Martin", "testUser14", "409 Alistar Road", "dummy59@gmail.com", []byte(""), []error{emptyPswd}},
-		// {"Password is too short", []string{"password", "password", "password"}, "Jon", "Martin", "testUser15", "409 Alistar Road", "dummy59@gmail.com", []byte("prompt"), []error{shortPswd, missingCapitalLetter, pswdHasNoDigits}},
-		// {"Password is too long", []string{"password"}, "Jon", "Martin", "testUser16", "409 Alistar Road", "dummy59@gmail.com", []byte("passwordPomp4323349484734743743233"), []error{longPswd}},
-		// {"Password has no digits", []string{"password", "password", "password"}, "Jon", "Martin", "testUser17", "409 Alistar Road", "dummy59@gmail.com", []byte("passwordpomppppp"), []error{missingCapitalLetter, pswdHasNoDigits}}, {"Password has symbols", []string{"password"}, "Jon", "Martin", "testUser18", "409 Alistar Road", "dummy59@gmail.com", []byte("passwordPomp43!"), []error{pswdHasSymbols}},
+	testCaseLst := []testcase{
+		{"case01_fname_lname_empty.json", []error{errEmptyField, errEmptyField}},
+		{"case02_fname_has_spaces.json", []error{errHasPunct}},
+		{"case03_fname_has_nums.json", []error{errHasNums}},
+		{"case04_fname_has_symbols.json", []error{errHasSymbols}},
+		{"case05_lname_has_spaces.json", []error{errHasPunct}},
+		{"case06_lname_has_nums.json", []error{errHasNums}},
+		{"case07_lname_has_symbols.json", []error{errHasSymbols}},
+		{"case08_addr_empty.json", []error{errEmptyField}},
+		{"case09_addr_has_symbols.json", []error{errHasSymbols}},
+		{"case10_email_empty.json", []error{errEmptyField}},
+		{"case11_email_bad_addr.json", []error{errReqEndingAddr}},
+		{"case12_email_miss_symbol.json", []error{errReqSymbol}},
+		{"case13_pswd_empty.json", []error{emptyPswd}},
+		{"case14_pswd_miss_capital.json", []error{missingCapitalLetter}},
+		{"case15_pswd_too_short.json", []error{shortPswd, missingCapitalLetter, pswdHasNoDigits}},
+		{"case16_pswd_too_long.json", []error{longPswd}},
+		{"case17_pswd_miss_digits.json", []error{missingCapitalLetter, pswdHasNoDigits}},
+		{"case18_pswd_has_symbols.json", []error{pswdHasSymbols}},
+	}
+	tests := []create_acct_testcase{}
+	for _, tc := range testCaseLst {
+		test := bind_TestCase(t, "invalidAccts", tc.path)
+		test.ErrLst = tc.errLst
+		tests = append(tests, test)
 	}
 
 	// range over table tests and validate the right errs are being thrown
@@ -126,10 +161,10 @@ func Test_accountcreation(t *testing.T) {
 		w := httptest.NewRecorder()
 		c := r.NewContext(req, w)
 		c.SetPath("/posts")
-		t.Run(tt.testName, func(t *testing.T) {
-			tempAcct := Account{Fname: tt.fname, Lname: tt.lname, Username: tt.username, Address: tt.address, Email: tt.email, Password: tt.password}
+		t.Run(tt.TestName, func(t *testing.T) {
+			tempAcct := Account{Fname: tt.Fname, Lname: tt.Lname, Username: tt.Username, Address: tt.Address, Email: tt.Email, Password: tt.Password}
 			actualErrLst := VetAllFields(tempAcct)
-			expectedErrLst := printAcctErrs(tt.attribNames, tt.errLst)
+			expectedErrLst := printAcctErrs(tt.AttribNames, tt.ErrLst)
 			assert.Equal(t, expectedErrLst, actualErrLst, expectedErrLst)
 
 		})
