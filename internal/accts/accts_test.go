@@ -172,30 +172,54 @@ func Test_accountcreation(t *testing.T) {
 }
 
 func Test_userlogin(t *testing.T) {
-	r := setupEchoClient()
+	pool := testutils.TestPool(t)
+	defer pool.Close()
 
-	invalidUserCreds := errors.New("incorrect email or password.")
-	failedDBConn := errors.New("database error: couldn’t connect to drumstick")
-	tests := []struct {
-		testName string
-		username string
-		password string
-	}{
-		{"Empty values", "", ""},
-		{"bad password", "dummy2", "dummy54Dwdgfdgf"},
-		{"bad username", "dummy2", "mldKMuffinDrop4"},
-		{"password is too long", "dummy2", "lkdrWkkkkkkkkk"},
-		{"password is too short", "dummy2", "dfdf"},
-		{"password is good", "dummy@gmail.com", "superSecretP432"},
-	}
+	testutils.ResetAndTestTx(t, pool, func(ctx context.Context, tx pgx.Tx) {
+		invalidUserCreds := errors.New("incorrect email or password.")
+		tests := []struct {
+			testName    string
+			username    string
+			password    string
+			expectedErr error
+		}{
+			{"Empty values", "", "", invalidUserCreds},
+			{"bad password", "dummy2", "dummy54Dwdgfdgf", invalidUserCreds},
+			{"bad username", "dummy2", "mldKMuffinDrop4", invalidUserCreds},
+			{"password is too long", "dummy2", "lkdrWkkkkkkkkk", invalidUserCreds},
+			{"password is too short", "dummy2", "dfdf", invalidUserCreds},
+			{"password is good", "dummy@gmail.com", "superSecretP432", nil},
+		}
 
-	for _, tt := range tests {
-		req, _ := http.NewRequest("POST", "/posts", nil)
-		w := httptest.NewRecorder()
-		c := r.NewContext(req, w)
-		c.SetPath("/posts")
-		t.Run(tt.testName, func(t *testing.T) {
-			actualErr := CompareUserCreds(tt.username, tt.password)
+		// logic for the good pswd testcase
+		relFilePath := filepath.Join("testdata", "dummy_acct.json")
+		jsonData, readErr := os.ReadFile(relFilePath)
+		if readErr != nil {
+			t.Fatal(readErr)
+		}
+
+		var tempAcct Account
+		bindingErr := json.Unmarshal(jsonData, &tempAcct)
+		if bindingErr != nil {
+			t.Fatal(bindingErr)
+		}
+
+		_, acctErr := CreateAcct(ctx, tx, tempAcct)
+		if acctErr != nil {
+			t.Fatal(acctErr)
+		}
+
+		for _, tt := range tests {
+			t.Run(tt.testName, func(t *testing.T) {
+				actualErr := CompareUserCreds(ctx, tx, tt.username, tt.password)
+				if !(actualErr.Error() == tt.expectedErr.Error()) {
+					t.Fatalf("got: %v , expected: %v ", actualErr, tt.expectedErr)
+				}
+			})
+		}
+	})
+}
+
 
 			if errors.Is(actualErr, invalidUserCreds) {
 				assert.EqualError(t, actualErr, invalidUserCreds.Error())
