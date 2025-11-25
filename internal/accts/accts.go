@@ -53,6 +53,7 @@ var InvalidUserCreds error = errors.New("incorrect email or password.")
 // email errs
 var ErrReqEmailSymbol = errors.New("email is missing an '@' symbol.")
 var ErrReqEndingAddr = errors.New("email doesn't match any of the ending addresses.")
+var ErrEmailNotFound = errors.New("error: user-id not found: email does not exist")
 
 // pswd errs
 var EmptyPswd = errors.New("field can't be empty")
@@ -323,7 +324,7 @@ func UserIDByEmail(ctx context.Context, db backend.Querier, email string) (int, 
 	err := pgxscan.Select(ctx, db, &user, `SELECT id FROM user_account WHERE email = $1`, email)
 
 	if errors.Is(err, pgx.ErrNoRows) {
-		return 0, errors.New("error: resource not found: id does not exist")
+		return 0, ErrEmailNotFound
 	}
 
 	if err != nil {
@@ -331,7 +332,7 @@ func UserIDByEmail(ctx context.Context, db backend.Querier, email string) (int, 
 	}
 
 	if len(user) == 0 {
-		return 0, errors.New("error: resource not found: id does not exist")
+		return 0, ErrEmailNotFound
 	}
 
 	userID := user[0].ID
