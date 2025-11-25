@@ -175,21 +175,68 @@ func Test_userlogin(t *testing.T) {
 	pool := testutils.TestPool(t)
 	defer pool.Close()
 
-	testutils.ResetAndTestTx(t, pool, func(ctx context.Context, tx pgx.Tx) {
-		invalidUserCreds := errors.New("incorrect email or password.")
-		tests := []struct {
-			testName    string
-			username    string
-			password    string
-			expectedErr error
-		}{
-			{"Empty values", "", "", invalidUserCreds},
-			{"bad password", "dummy2", "dummy54Dwdgfdgf", invalidUserCreds},
-			{"bad username", "dummy2", "mldKMuffinDrop4", invalidUserCreds},
-			{"password is too long", "dummy2", "lkdrWkkkkkkkkk", invalidUserCreds},
-			{"password is too short", "dummy2", "dfdf", invalidUserCreds},
-			{"password is good", "dummy@gmail.com", "superSecretP432", nil},
-		}
+	ctx := context.Background()
+	_, resetAndTestTxErr := pool.Exec(ctx, "TRUNCATE user_account RESTART IDENTITY CASCADE")
+	if resetAndTestTxErr != nil {
+		t.Fatal(resetAndTestTxErr)
+	}
+	// logic for the good pswd testcase
+	relFilePath := filepath.Join("testdata", "dummy_acct.json")
+	jsonData, readErr := os.ReadFile(relFilePath)
+	if readErr != nil {
+		t.Fatal(readErr)
+	}
+
+	var tempAcct Account
+	bindingErr := json.Unmarshal(jsonData, &tempAcct)
+	if bindingErr != nil {
+		t.Fatal(bindingErr)
+	}
+
+	tx, txErr := pool.Begin(ctx)
+	if txErr != nil {
+		t.Fatal(txErr)
+	}
+
+	_, acctErr := CreateAcct(ctx, tx, tempAcct)
+	if acctErr != nil {
+		tx.Rollback(ctx)
+		t.Fatal(acctErr)
+	}
+
+	txErr = tx.Commit(ctx)
+	if txErr != nil {
+		t.Fatal(txErr)
+	}
+
+	tests := []struct {
+		testName    string
+		username    string
+		password    string
+		expectedErr error
+	}{
+		{"Empty values", "", "", InvalidUserCreds},
+		{"bad password", "dummy2", "dummy54Dwdgfdgf", InvalidUserCreds},
+		{"bad username", "dummy2", "mldKMuffinDrop4", InvalidUserCreds},
+		{"password is too long", "dummy2", "lkdrWkkkkkkkkk", InvalidUserCreds},
+		{"password is too short", "dummy2", "dfdf", InvalidUserCreds},
+		{"password is good", "dummy@gmail.com", "superSecretP432", nil},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.testName, func(t *testing.T) {
+			actualErr := CompareUserCreds(ctx, pool, tt.username, tt.password)
+			if !errors.Is(actualErr, tt.expectedErr) {
+				t.Fatalf("got: %v , expected: %v ", actualErr, tt.expectedErr)
+			}
+		})
+	}
+
+	_, resetAndTestTxErr = pool.Exec(ctx, "TRUNCATE user_account RESTART IDENTITY CASCADE")
+	if resetAndTestTxErr != nil {
+		t.Fatal(resetAndTestTxErr)
+	}
+}
 
 		// logic for the good pswd testcase
 		relFilePath := filepath.Join("testdata", "dummy_acct.json")

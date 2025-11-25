@@ -41,6 +41,9 @@ type Account struct {
 	Password []byte `json:"password" form:"password"`
 }
 
+// all the errors
+var InvalidUserCreds error = errors.New("incorrect email or password.")
+
 // encrypts a byte slice secret using bcrypt
 func encryptPassword(s []byte) ([]byte, error) {
 	hash, err := bcrypt.GenerateFromPassword(s, 14)
@@ -233,10 +236,9 @@ func CompareUserCreds(ctx context.Context, db backend.Querier, email string, psw
 		}
 	}
 
-	invalidUserCreds := errors.New("incorrect email or password.")
 	if !emailIsReal {
-		log.Println(invalidUserCreds)
-		return invalidUserCreds
+		log.Println(InvalidUserCreds)
+		return InvalidUserCreds
 	}
 
 	// need pswd hash from database
@@ -251,8 +253,8 @@ func CompareUserCreds(ctx context.Context, db backend.Querier, email string, psw
 	}
 
 	if len(users) == 0 {
-		log.Println(invalidUserCreds)
-		return invalidUserCreds
+		log.Println(InvalidUserCreds)
+		return InvalidUserCreds
 	}
 
 	hashIsReal := false
@@ -264,8 +266,8 @@ func CompareUserCreds(ctx context.Context, db backend.Querier, email string, psw
 	}
 
 	if !hashIsReal {
-		log.Println(invalidUserCreds)
-		return invalidUserCreds
+		log.Println(InvalidUserCreds)
+		return InvalidUserCreds
 	}
 
 	return nil
