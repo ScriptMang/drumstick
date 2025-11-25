@@ -6,8 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"html/template"
-	"net/http"
-	"net/http/httptest"
 	"os"
 	"path/filepath"
 	"testing"
@@ -29,6 +27,7 @@ type create_acct_testcase struct {
 	Password                               []byte
 	ErrLst                                 []error
 }
+
 type testcase struct {
 	path   string
 	errLst []error
@@ -108,8 +107,6 @@ func bind_TestCase(t *testing.T, dir string, file string) create_acct_testcase {
 }
 
 func Test_accountcreation(t *testing.T) {
-	r := setupEchoClient()
-
 	// field errors
 	errEmptyField := errors.New("field is empty")
 	errHasNums := errors.New("field can't contain any numbers")
@@ -157,10 +154,6 @@ func Test_accountcreation(t *testing.T) {
 
 	// range over table tests and validate the right errs are being thrown
 	for _, tt := range tests {
-		req, _ := http.NewRequest("POST", "/view", nil)
-		w := httptest.NewRecorder()
-		c := r.NewContext(req, w)
-		c.SetPath("/posts")
 		t.Run(tt.TestName, func(t *testing.T) {
 			tempAcct := Account{Fname: tt.Fname, Lname: tt.Lname, Username: tt.Username, Address: tt.Address, Email: tt.Email, Password: tt.Password}
 			actualErrLst := VetAllFields(tempAcct)
