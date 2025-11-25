@@ -41,8 +41,26 @@ type Account struct {
 	Password []byte `json:"password" form:"password"`
 }
 
-// all the errors
+// general acct field errs
+var ErrEmptyField = errors.New("field is empty")
+var ErrHasPunct = errors.New("field has punctuation")
+var ErrHasNums = errors.New("field can't contain any numbers")
+var ErrHasSymbols = errors.New("field can't contain any symbols")
+
+// user-cred errs
 var InvalidUserCreds error = errors.New("incorrect email or password.")
+
+// email errs
+var ErrReqEmailSymbol = errors.New("email is missing an '@' symbol.")
+var ErrReqEndingAddr = errors.New("email doesn't match any of the ending addresses.")
+
+// pswd errs
+var EmptyPswd = errors.New("field can't be empty")
+var PswdTooShort = errors.New("field too short")
+var PswdTooLong = errors.New("field too long")
+var PswdHasNoCapLetters = errors.New("field is missing at least 1 capital letter")
+var PswdHasNoDigits = errors.New("field missing at least 1 digit")
+var PswdHasSymbols = errors.New("field can't contain any symbols")
 
 // encrypts a byte slice secret using bcrypt
 func encryptPassword(s []byte) ([]byte, error) {
@@ -53,29 +71,26 @@ func encryptPassword(s []byte) ([]byte, error) {
 // function for wrapping a bunch of empty field errors
 // and returning them as a slice
 func fieldIsEmpty(val, fieldname string) error {
-	errEmptyField := errors.New("field is empty")
 	var rsltErr error
 	if val == "" || len(val) == 0 {
-		rsltErr = fmt.Errorf("error:%s:%w", fieldname, errEmptyField)
+		rsltErr = fmt.Errorf("error:%s:%w", fieldname, ErrEmptyField)
 	}
 	return rsltErr
 }
 
 func fieldHasPunct(val, fieldname string) error {
-	errHasPunct := errors.New("field has punctuation")
 	var rsltErr error
 	if strings.ContainsAny(val, " ?.!:,;") {
-		rsltErr = fmt.Errorf("error:%s:%w", fieldname, errHasPunct)
+		rsltErr = fmt.Errorf("error:%s:%w", fieldname, ErrHasPunct)
 	}
 	return rsltErr
 }
 
 // checks an account field for any numbers and returns a slice of errors
 func fieldHasNumbers(val, fieldname string) error {
-	errHasNums := errors.New("field can't contain any numbers")
 	var rsltErr error
 	if strings.ContainsAny(val, "0123456789") {
-		rsltErr = fmt.Errorf("error:%s:%w", fieldname, errHasNums)
+		rsltErr = fmt.Errorf("error:%s:%w", fieldname, ErrHasNums)
 	}
 	return rsltErr
 }
@@ -83,11 +98,9 @@ func fieldHasNumbers(val, fieldname string) error {
 // checks an account field for any symbols and returns a slice of errors
 func fieldHasSymbols(val, fieldname string) error {
 	var rsltErr error
-	errHasSymbols := errors.New("field can't contain any symbols")
 	symbolsFilter := "!@$_^%&*();/-+=\"'`~[]{}<|>"
-
 	if strings.ContainsAny(val, symbolsFilter) {
-		rsltErr = fmt.Errorf("error:%s:%w", fieldname, errHasSymbols)
+		rsltErr = fmt.Errorf("error:%s:%w", fieldname, ErrHasSymbols)
 	}
 	return rsltErr
 }
@@ -99,8 +112,6 @@ func vetEmailAddress(email string) []error {
 
 	reqSymbols := "@"
 	endingAddrs := []string{".com", ".org", ".net"}
-	errReqSymbol := errors.New("email is missing an '@' symbol.")
-	errReqEndingAddr := errors.New("email doesn't match any of the ending addresses.")
 
 	// if the email is empty, don't return an error
 	// its already handled by another func
@@ -110,7 +121,7 @@ func vetEmailAddress(email string) []error {
 
 	// the  email must have an @ symbol
 	if !strings.ContainsAny(email, reqSymbols) {
-		tmpErrs = append(tmpErrs, fmt.Errorf("error:email:%w", errReqSymbol))
+		tmpErrs = append(tmpErrs, fmt.Errorf("error:email:%w", ErrReqEmailSymbol))
 	}
 
 	validEmailOrg := false
@@ -121,7 +132,7 @@ func vetEmailAddress(email string) []error {
 	}
 
 	if !validEmailOrg {
-		tmpErrs = append(tmpErrs, fmt.Errorf("error:email:%w", errReqEndingAddr))
+		tmpErrs = append(tmpErrs, fmt.Errorf("error:email:%w", ErrReqEndingAddr))
 	}
 
 	return tmpErrs
@@ -130,42 +141,36 @@ func vetEmailAddress(email string) []error {
 // verifies if the user's password meet standards for account creation
 // if it doesn't a slice of errors are returned
 func vetPassword(password string) []error {
-	emptyPswd := errors.New("field can't be empty")
-	pswdTooShort := errors.New("field too short")
-	pswdTooLong := errors.New("field too long")
-	pswdHasNoCapLetters := errors.New("field is missing at least 1 capital letter")
-	pswdHasNoDigits := errors.New("field missing at least 1 digit")
-	pswdHasSymbols := errors.New("field can't contain any symbols")
 
 	var rsltErr []error
 	switch {
 	case len(password) == 0:
-		rsltErr = append(rsltErr, fmt.Errorf("error:password:%w", emptyPswd))
+		rsltErr = append(rsltErr, fmt.Errorf("error:password:%w", EmptyPswd))
 		return rsltErr
 	case len(password) < 8:
-		rsltErr = append(rsltErr, fmt.Errorf("error:password:%w", pswdTooShort))
+		rsltErr = append(rsltErr, fmt.Errorf("error:password:%w", PswdTooShort))
 	case len(password) > 32:
-		rsltErr = append(rsltErr, fmt.Errorf("error:password:%w", pswdTooLong))
+		rsltErr = append(rsltErr, fmt.Errorf("error:password:%w", PswdTooLong))
 	}
 
 	// check for symbols in the pswd
 	symbolsFilter := "!@$_^%&*();/-+=\"'`~[]{}<|>"
 	if bytes.ContainsAny([]byte(password), symbolsFilter) {
-		rsltErr = append(rsltErr, fmt.Errorf("error:password:%w", pswdHasSymbols))
+		rsltErr = append(rsltErr, fmt.Errorf("error:password:%w", PswdHasSymbols))
 	}
 
 	// check for capital Letter in pswd
 	capLetters := "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 	pswdHasCaps := strings.ContainsAny(password, capLetters)
 	if !pswdHasCaps {
-		rsltErr = append(rsltErr, fmt.Errorf("error:password:%w", pswdHasNoCapLetters))
+		rsltErr = append(rsltErr, fmt.Errorf("error:password:%w", PswdHasNoCapLetters))
 	}
 
 	// check for number in pswd
 	nums := "012345689"
 	pswdHasNums := strings.ContainsAny(password, nums)
 	if !pswdHasNums {
-		rsltErr = append(rsltErr, fmt.Errorf("error:password:%w", pswdHasNoDigits))
+		rsltErr = append(rsltErr, fmt.Errorf("error:password:%w", PswdHasNoDigits))
 	}
 
 	return rsltErr
