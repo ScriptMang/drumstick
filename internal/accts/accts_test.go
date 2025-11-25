@@ -181,7 +181,6 @@ func Test_UserIDByEmail(t *testing.T) {
 	defer pool.Close()
 
 	testutils.ResetAndTestTx(t, pool, func(ctx context.Context, tx pgx.Tx) {
-		rscNotFound := errors.New("error: resource not found: id does not exist")
 		relFilePath := filepath.Join("testdata", "dummy_acct.json")
 		jsonData, readErr := os.ReadFile(relFilePath)
 		if readErr != nil {
@@ -204,8 +203,8 @@ func Test_UserIDByEmail(t *testing.T) {
 			return
 		}
 
-		if errors.Is(actualErr, rscNotFound) {
-			t.Fatal(rscNotFound)
+		if errors.Is(actualErr, ErrEmailNotFound) {
+			t.Fatal(ErrEmailNotFound)
 		} else if actualErr != nil {
 			t.Fatal(actualErr)
 		}
