@@ -237,7 +237,6 @@ func CompareUserCreds(ctx context.Context, db backend.Querier, email string, psw
 	}
 
 	if !emailIsReal {
-		log.Println(InvalidUserCreds)
 		return InvalidUserCreds
 	}
 
@@ -266,7 +265,6 @@ func CompareUserCreds(ctx context.Context, db backend.Querier, email string, psw
 	}
 
 	if !hashIsReal {
-		log.Println(InvalidUserCreds)
 		return InvalidUserCreds
 	}
 
