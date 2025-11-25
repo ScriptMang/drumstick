@@ -238,7 +238,14 @@ func Test_userlogin(t *testing.T) {
 	}
 }
 
-		// logic for the good pswd testcase
+// test userid retrieval by email
+func Test_UserIDByEmail(t *testing.T) {
+
+	pool := testutils.TestPool(t)
+	defer pool.Close()
+
+	testutils.ResetAndTestTx(t, pool, func(ctx context.Context, tx pgx.Tx) {
+		rscNotFound := errors.New("error: resource not found: id does not exist")
 		relFilePath := filepath.Join("testdata", "dummy_acct.json")
 		jsonData, readErr := os.ReadFile(relFilePath)
 		if readErr != nil {
@@ -255,50 +262,17 @@ func Test_userlogin(t *testing.T) {
 		if acctErr != nil {
 			t.Fatal(acctErr)
 		}
+		actualID, actualErr := UserIDByEmail(ctx, tx, tempAcct.Email)
 
-		for _, tt := range tests {
-			t.Run(tt.testName, func(t *testing.T) {
-				actualErr := CompareUserCreds(ctx, tx, tt.username, tt.password)
-				if !(actualErr.Error() == tt.expectedErr.Error()) {
-					t.Fatalf("got: %v , expected: %v ", actualErr, tt.expectedErr)
-				}
-			})
+		if actualID == 1 {
+			return
 		}
+
+		if errors.Is(actualErr, rscNotFound) {
+			t.Fatal(rscNotFound)
+		} else if actualErr != nil {
+			t.Fatal(actualErr)
+		}
+
 	})
-}
-
-
-			if errors.Is(actualErr, invalidUserCreds) {
-				assert.EqualError(t, actualErr, invalidUserCreds.Error())
-			}
-
-			if errors.Is(actualErr, failedDBConn) {
-				assert.EqualError(t, actualErr, failedDBConn.Error())
-			}
-
-			if actualErr == nil {
-				// the case that the usercreds are legit
-				assert.Equal(t, nil, actualErr)
-			}
-		})
-	}
-}
-
-// test userid retrieval by email
-func Test_UserIDByEmail(t *testing.T) {
-	rscNotFound := errors.New("error: resource not found: id does not exist")
-	sample := "dummy@gmail.com"
-	actual, actualErr := UserIDByEmail(sample)
-
-	if errors.Is(actualErr, pgx.ErrNoRows) {
-		assert.EqualError(t, actualErr, pgx.ErrNoRows.Error())
-	}
-
-	if errors.Is(actualErr, rscNotFound) {
-		assert.EqualError(t, actualErr, rscNotFound.Error())
-	}
-
-	if actualErr == nil {
-		assert.Equal(t, 1, actual)
-	}
 }
