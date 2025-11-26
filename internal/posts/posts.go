@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/georgysavva/scany/v2/pgxscan"
-	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 )
 
@@ -124,10 +123,7 @@ func CreatePosts(ctx context.Context, db backend.Querier, userPost, email string
 	uid, uidErr := accts.UserIDByEmail(ctx, db, email)
 
 	if uidErr != nil {
-		if errors.Is(uidErr, pgx.ErrNoRows) {
-			return nil, errors.New("error: resource not found: id with specified email couldn't be found")
-		}
-		return nil, fmt.Errorf("error: %w", uidErr)
+		return nil, uidErr
 	}
 
 	// get the  user's  username
@@ -159,10 +155,7 @@ func ReplyToPost(ctx context.Context, db backend.Querier, parentPID int, postBod
 	uid, uidErr := accts.UserIDByEmail(ctx, db, email)
 
 	if uidErr != nil {
-		if errors.Is(uidErr, pgx.ErrNoRows) {
-			return nil, errors.New("error: resource not found: id with specified email couldn't be found")
-		}
-		return nil, fmt.Errorf("error: %w", uidErr)
+		return nil, uidErr
 	}
 
 	// get the  user's  username
